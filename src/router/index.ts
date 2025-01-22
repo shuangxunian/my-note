@@ -16,6 +16,10 @@ const router = createRouter({
       component: () => import('@/views/main/AllPage.vue'),
     },
     {
+      path: '/bookDetail',
+      component: () => import('@/views/book-detail/bookDetail.vue'),
+    },
+    {
       path: '/:pathMatch(.*)',
       component: () => import('@/views/not-found/NotFound.vue'),
     },
