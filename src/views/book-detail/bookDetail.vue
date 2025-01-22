@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import LeaferEditor from '@/components/editor/leaferEditor.vue'
 import img from '@/assets/img/image.png'
 
 interface Page {
@@ -107,7 +108,9 @@ onMounted(async () => {
           <div class="text">第{{ index + 1 }}页</div>
         </div>
       </el-scrollbar>
-      <div class="page-now"></div>
+      <div class="page-now">
+        <LeaferEditor />
+      </div>
       <div class="page-option"></div>
     </div>
   </div>
