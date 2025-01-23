@@ -1,71 +1,87 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
+import { ZoomEvent, LeafHelper } from 'leafer-ui'
 import { App } from 'leafer-editor'
 
 interface LeaferChild {
-  tag: string
-  x: number
-  y: number
-  width: number
-  height: number
-  fill: string
-  editable: boolean
+  tag?: string
+  x?: number
+  y?: number
+  width?: number
+  height?: number
+  strokeWidth?: number
+  stroke?: string
+  fill?: string
+  text?: string
+  children?: LeaferChild[]
 }
 
 interface LeaferJson {
-  fill: string
-  type: string
+  type?: string
+  fill?: string
   children: LeaferChild[]
 }
+
+const leaferEditor = ref(null)
 
 const buildLeafer = () => {
   const app = new App({
     view: 'leafer-editor',
-    height: 1056,
-    width: 816,
-    type: 'viewport',
-    tree: {},
+    fill: '#4B3C31',
+    tree: {
+      type: 'design',
+    },
     editor: {},
+    zoom: { min: 1, max: 16 },
+    move: { scroll: 'limit', drag: true },
   })
 
   const json: LeaferJson = {
-    fill: '#fbf0f0',
-    type: 'viewport',
     children: [],
   }
-  for (let i = 0; i < 10; i++) {
-    json.children.push({
-      tag: 'Rect',
-      x: 100 * i,
-      y: 100,
-      width: 100,
-      height: 100,
-      fill: '#f00',
-      editable: true,
+  json.children.push({
+    tag: 'Box',
+    height: 1056,
+    width: 816,
+    fill: '#fbf0f0',
+    children: [],
+  })
+  for (let i = 1; i < 30; i++) {
+    json.children[0]?.children.push({
+      tag: 'Line',
+      x: 58,
+      y: 32 * i + 50,
+      width: 700,
+      strokeWidth: 1,
+      stroke: '#999',
+    })
+  }
+  for (let i = 1; i < 30; i++) {
+    json.children[0]?.children.push({
+      tag: 'Text',
+      x: 58,
+      y: 32 * i + 50,
+      text: i + '',
+      fill: 'black',
     })
   }
   app.tree.set(json)
+  const width = leaferEditor.value.offsetWidth
 
-  // app.tree = app.addLeafer()
-  // app.sky = app.addLeafer({ type: 'draw', usePartRender: false })
-
-  // app.editor = new Editor()
-  // app.sky.add(app.editor)
-  // const app = new App({
-  //   view: 'leafer-editor',
-  //   width: 816,
-  //   height: 1056,
-  //   ground: {},
-  //   tree: {}, // 添加 tree 层
-  //   sky: {}, // 添加 sky 层
-  //   editor: {}, // 会自动创建 editor实例、tree层、sky层
-  // })
-  // app.tree.add(
-  //   Rect.one({ editable: true, fill: '#FEB027', cornerRadius: [20, 0, 0, 20] }, 100, 100),
-  // )
-  // app.tree.add(
-  //   Rect.one({ editable: true, fill: '#FFE04B', cornerRadius: [0, 20, 20, 0] }, 300, 100),
-  // )
+  app.tree.zoom('fit', 0, true)
+  // 监听
+  app.tree.on(ZoomEvent.END, function (e: ZoomEvent) {
+    // 如果外面的宽度大于当前这个组件的宽度才居中
+    if (width > app.tree.children[0].worldBoxBounds.width) {
+      // 居中逻辑
+      // debugger
+      console.log(app.tree.children[0].boxBounds.y)
+      console.log(app.tree.children[0].renderBounds.y)
+      console.log(app.tree.children[0].worldBoxBounds.y)
+      console.log(app.tree.children[0].worldRenderBounds.y)
+      app.tree.zoom('fit', 0, true)
+    }
+  })
 }
 
 onMounted(() => {
@@ -74,7 +90,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div id="leafer-editor" class="leafer-editor"></div>
+  <div ref="leaferEditor" id="leafer-editor" class="leafer-editor"></div>
 </template>
 
 <style lang="less" scoped>

@@ -10,6 +10,13 @@ import { createStyleImportPlugin, ElementPlusResolve } from 'vite-plugin-style-i
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: './',
+  server: {
+    host: '0.0.0.0',
+    port: 5173,
+    open: true,
+    cors: true,
+  },
   plugins: [
     vue(),
     vueDevTools(),
