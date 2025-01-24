@@ -8,6 +8,7 @@ interface Page {
   pageID: string
   img: string
 }
+
 const router = useRouter()
 const items = ['Aim', 'EditPen', 'Plus', 'Minus']
 const activeIndex = ref(0)
@@ -109,7 +110,7 @@ onMounted(async () => {
         </div>
       </el-scrollbar>
       <div class="page-now">
-        <LeaferEditor />
+        <LeaferEditor :active-index="activeIndex" />
       </div>
       <div class="page-option"></div>
     </div>
