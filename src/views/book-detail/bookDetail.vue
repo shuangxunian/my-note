@@ -11,7 +11,7 @@ interface Page {
 
 const router = useRouter()
 const items = ['Aim', 'EditPen', 'Plus', 'Minus']
-const activeIndex = ref(0)
+const activeIndex = ref(1)
 const pageList = ref<Page[]>([])
 
 const setActive = (index: number) => {
@@ -20,42 +20,6 @@ const setActive = (index: number) => {
 
 const getPageList = async () => {
   const data = [
-    {
-      pageID: '1',
-      img: img,
-    },
-    {
-      pageID: '2',
-      img: img,
-    },
-    {
-      pageID: '3',
-      img: img,
-    },
-    {
-      pageID: '1',
-      img: img,
-    },
-    {
-      pageID: '2',
-      img: img,
-    },
-    {
-      pageID: '3',
-      img: img,
-    },
-    {
-      pageID: '1',
-      img: img,
-    },
-    {
-      pageID: '2',
-      img: img,
-    },
-    {
-      pageID: '3',
-      img: img,
-    },
     {
       pageID: '1',
       img: img,

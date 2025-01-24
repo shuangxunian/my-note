@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
-import { ZoomEvent, DragEvent, PointerEvent, Box } from 'leafer-ui'
+import { ZoomEvent, DragEvent, PointerEvent, Rect, Pen, Box } from 'leafer-ui'
 import { App } from 'leafer-editor'
 
 interface LeaferChild {
@@ -51,11 +51,49 @@ const props = withDefaults(
 )
 
 const leaferEditor = ref<HTMLElement | null>(null)
+const selectedGraphics = ref<null | any>(null)
 let app: App | null = null
 
-const mousedown = (e: DragEvent) => {}
-const mousemove = (e: DragEvent) => {}
-const mouseup = (e: DragEvent) => {}
+const mousedown = (e: DragEvent) => {
+  console.log('down')
+  if (props.activeIndex !== 1) {
+    return
+  }
+  const { x, y } = e.getPage()
+
+  const pen: Pen = new Pen({
+    name: 'brushTool',
+    x,
+    y,
+    editable: true,
+  })
+
+  pen.setStyle({
+    strokeWidth: 3,
+    stroke: 'rgba(0, 0, 0, 1)',
+    strokeCap: 'round',
+    strokeJoin: 'round',
+  })
+
+  selectedGraphics.value = pen
+
+  app?.tree.add(pen)
+  debugger
+}
+
+const mousemove = (e: DragEvent) => {
+  console.log('move')
+  if (props.activeIndex !== 1) return
+  if (selectedGraphics.value) return
+  const { x, y } = selectedGraphics.value
+  console.log(x, y)
+}
+
+const mouseup = (e: DragEvent) => {
+  if (props.activeIndex !== 1) {
+    return
+  }
+}
 
 const buildLeafer = () => {
   app = new App({
@@ -120,12 +158,12 @@ const buildLeafer = () => {
     }
   })
   console.log('jiazai')
-  box.on(PointerEvent.DOWN, function (e: PointerEvent) {
-    console.log('box down', e)
-  })
-  // app.on(DragEvent.DOWN, mousedown)
-  // app.on(DragEvent.DRAG, mousemove)
-  // app.on(DragEvent.UP, mouseup)
+  // box.on(PointerEvent.DOWN, function (e: PointerEvent) {
+  //   console.log('box down', e)
+  // })
+  app.on(DragEvent.DOWN, mousedown)
+  app.on(DragEvent.DRAG, mousemove)
+  app.on(DragEvent.UP, mouseup)
 }
 
 // 监听 activeIndex 的变化
@@ -133,7 +171,9 @@ watch(
   () => props.activeIndex,
   (newIndex) => {
     if (!app) return
-    console.log(newIndex)
+    if (newIndex === 0) app.config.move.drag = true
+    else app.config.move.drag = false
+    // console.log(newIndex)
   },
   { immediate: true },
 )
