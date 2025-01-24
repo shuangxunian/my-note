@@ -7,6 +7,8 @@ import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import { createStyleImportPlugin, ElementPlusResolve } from 'vite-plugin-style-import'
+import vueJsx from '@vitejs/plugin-vue-jsx'
+import svgLoader from 'vite-svg-loader'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -20,6 +22,8 @@ export default defineConfig({
   plugins: [
     vue(),
     vueDevTools(),
+    vueJsx(),
+    svgLoader(),
     AutoImport({
       resolvers: [ElementPlusResolver()],
     }),
