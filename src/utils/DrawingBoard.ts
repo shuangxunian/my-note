@@ -4,7 +4,7 @@ import '@leafer-in/view'
 import '@leafer-in/viewport'
 import '@leafer-in/export'
 import Tools, { INITIAL_HEIGHT, INITIAL_WIDTH } from './Tools'
-import { App, DragEvent, Text, Box, ZoomEvent, Group } from 'leafer-ui'
+import { App, DragEvent, Box, ZoomEvent, Group } from 'leafer-ui'
 import type { ICursorType, ILeaf, IUIJSONData } from 'leafer-ui'
 import { ref, toRef, watch } from 'vue'
 import type { Ref } from 'vue'
@@ -67,8 +67,8 @@ class DrawingBoard {
   }
 
   public activeIndexChange = (activeIndex: number) => {
-    if (activeIndex !== 0) this.leaferInstance.config.move.drag = false
-    else this.leaferInstance.config.move.drag = true
+    if (activeIndex === 8) this.leaferInstance.config.move.drag = true
+    else delete this.leaferInstance.config.move.drag
     this.tools.toolbarActiveIndex.value = activeIndex
   }
 
@@ -118,7 +118,7 @@ class DrawingBoard {
       },
       editor: {},
       zoom: { min: 1, max: 16 },
-      move: { scroll: 'limit', drag: true },
+      move: { scroll: 'limit' },
     })
 
     const pageBox = this.addPage()
@@ -137,7 +137,7 @@ class DrawingBoard {
     app.tree.zoom('fit', 0, true)
 
     // 监听
-    app.ground.on(ZoomEvent.END, (e: ZoomEvent) => {
+    app.ground.on(ZoomEvent.END, () => {
       // 如果外面的宽度大于当前这个组件的宽度才居中
       if (this.userDefinedData.bodyWidth > app.ground.children[0].worldBoxBounds.width) {
         // 居中逻辑
@@ -145,7 +145,7 @@ class DrawingBoard {
       }
     })
     // 监听
-    app.tree.on(ZoomEvent.END, (e: ZoomEvent) => {
+    app.tree.on(ZoomEvent.END, () => {
       // 如果外面的宽度大于当前这个组件的宽度才居中
       if (this.userDefinedData.bodyWidth > app.tree.children[0].worldBoxBounds.width) {
         // 居中逻辑
@@ -203,6 +203,9 @@ class DrawingBoard {
 
     // 快捷键取消撤销
     if (event.ctrlKey && event.key === 'y') this.historyUnBack()
+
+    // 快捷键删除
+    if ((event.ctrlKey && event.key === 'Delete') || event.key === 'Backspace') this.deleteData()
   }
 
   private mousedown = (e: DragEvent) =>
@@ -214,7 +217,8 @@ class DrawingBoard {
       const graph = graphics.createdFactory!(x - INITIAL_WIDTH, y - INITIAL_HEIGHT)
 
       this.selectedGraphics.value = graph
-      this.leaferInstance.tree.children[0].children[0].add(graph)
+      // this.leaferInstance.tree.children[0].children[0].add(graph)
+      this.leaferInstance.tree.add(graph)
     })
 
   private mousemove = (e: DragEvent) =>
@@ -268,11 +272,15 @@ class DrawingBoard {
   }
 
   private aop = (beforeHandler, afterHandler) => {
-    beforeHandler && beforeHandler()
+    if (beforeHandler) {
+      beforeHandler()
+    }
 
     if (!this.tools.toolbarActiveIndex.value) return
 
-    afterHandler && afterHandler()
+    if (afterHandler) {
+      afterHandler()
+    }
   }
 
   public setEditorState = (state: boolean) => {
@@ -323,6 +331,10 @@ class DrawingBoard {
     this.setJson(this.history.getUnBackJson())
   }
 
+  deleteData = () => {
+    this.selectedGraphics.value.remove()
+  }
+
   clearData = () => {
     this.leaferInstanceReadonly.tree.clear()
     const box = this.addPage()
@@ -330,6 +342,7 @@ class DrawingBoard {
   }
 
   downLoad = () => {
+    console.log('down')
     this.leaferInstanceReadonly.export('画板.png')
   }
 }

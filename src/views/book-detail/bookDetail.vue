@@ -19,6 +19,7 @@ const items = [
   'icon-bottom',
   'icon-wenzi',
   'icon-rubber',
+  'icon-tuozhuai',
 ]
 const activeIndex = ref(0)
 const pageList = ref<Page[]>([])

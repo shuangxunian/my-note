@@ -63,7 +63,7 @@ export const toolBarOptions: IToolBarItem[] = [
     title: '矩形',
     strokeWidth: 2,
     stroke: 'rgba(0, 0, 0, 1)',
-    fill: COLOR.WHITE,
+    // fill: COLOR.WHITE,
     createdFactory(x: number, y: number) {
       return new Rect({
         name: 'rectTool',
