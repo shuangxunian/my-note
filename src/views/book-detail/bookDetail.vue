@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import LeaferEditor from '@/components/editor/leaferEditor.vue'
+import LeaferOption from '@/components/option/leaferOption.vue'
 import img from '@/assets/img/image.png'
 
 interface Page {
@@ -24,6 +25,7 @@ const items = [
 const activeIndex = ref(0)
 const pageList = ref<Page[]>([])
 const leaferEditor = ref<HTMLElement | null>(null)
+const leaferOption = ref<HTMLElement | null>(null)
 
 const setActive = (index: number) => {
   activeIndex.value = index
@@ -117,7 +119,9 @@ onMounted(async () => {
       <div class="page-now">
         <LeaferEditor ref="leaferEditor" :active-index="activeIndex" />
       </div>
-      <div class="page-option"></div>
+      <div class="page-option">
+        <LeaferOption ref="leaferOption" :active-index="activeIndex" />
+      </div>
     </div>
   </div>
 </template>
@@ -151,7 +155,6 @@ onMounted(async () => {
         font-size: 14px; /* 文字小一点 */
         color: #999; /* 颜色浅一点 */
         cursor: pointer;
-        transition: color 0.3s;
       }
       .parting-line {
         height: 20px;
@@ -160,7 +163,6 @@ onMounted(async () => {
       .each-type.active {
         color: #000; /* 被选中的颜色深一点 */
         background-color: #eee;
-        // border: 1px solid #333; /* 添加边框 */
         border-radius: 4px; /* 可选：添加圆角 */
       }
       .each-type:hover {

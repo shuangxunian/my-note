@@ -16,6 +16,7 @@ declare module 'vue' {
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
     ElSwitch: typeof import('element-plus/es')['ElSwitch']
     LeaferEditor: typeof import('./src/components/editor/leaferEditor.vue')['default']
+    LeaferOption: typeof import('./src/components/option/leaferOption.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }
