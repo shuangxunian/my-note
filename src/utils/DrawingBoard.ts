@@ -4,7 +4,7 @@ import '@leafer-in/view'
 import '@leafer-in/viewport'
 import '@leafer-in/export'
 import Tools, { INITIAL_HEIGHT, INITIAL_WIDTH } from './Tools'
-import { App, DragEvent, Text, Box, ZoomEvent } from 'leafer-ui'
+import { App, DragEvent, Text, Box, ZoomEvent, Group } from 'leafer-ui'
 import type { ICursorType, ILeaf, IUIJSONData } from 'leafer-ui'
 import { ref, toRef, watch } from 'vue'
 import type { Ref } from 'vue'
@@ -110,6 +110,9 @@ class DrawingBoard {
     const app = new App({
       view,
       fill: '#4B3C31',
+      ground: {
+        type: 'design',
+      },
       tree: {
         type: 'design',
       },
@@ -118,22 +121,29 @@ class DrawingBoard {
       move: { scroll: 'limit', drag: true },
     })
 
-    const box = this.addPage()
+    const pageBox = this.addPage()
+    const userBox = this.addPage()
+    this.pageBox = pageBox
+    app.ground.add(pageBox)
+    app.tree.add(
+      new Group({
+        x: 0,
+        y: 0,
+        children: [userBox],
+      }),
+    )
 
-    this.pageBox = box
-
-    app.tree.add(box)
-
-    const userBox = new Box({
-      x: 0,
-      y: 0,
-      height: 1056,
-      width: 816,
-      overflow: 'hide',
-    })
-    app.tree.add(userBox)
-
+    app.ground.zoom('fit', 0, true)
     app.tree.zoom('fit', 0, true)
+
+    // 监听
+    app.ground.on(ZoomEvent.END, (e: ZoomEvent) => {
+      // 如果外面的宽度大于当前这个组件的宽度才居中
+      if (this.userDefinedData.bodyWidth > app.ground.children[0].worldBoxBounds.width) {
+        // 居中逻辑
+        app?.ground.zoom('fit', 0, true)
+      }
+    })
     // 监听
     app.tree.on(ZoomEvent.END, (e: ZoomEvent) => {
       // 如果外面的宽度大于当前这个组件的宽度才居中
@@ -204,8 +214,7 @@ class DrawingBoard {
       const graph = graphics.createdFactory!(x - INITIAL_WIDTH, y - INITIAL_HEIGHT)
 
       this.selectedGraphics.value = graph
-      console.log(this.leaferInstance.tree.children)
-      this.leaferInstance.tree.children[1].add(graph)
+      this.leaferInstance.tree.children[0].children[0].add(graph)
     })
 
   private mousemove = (e: DragEvent) =>
