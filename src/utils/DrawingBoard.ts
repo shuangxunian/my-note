@@ -2,6 +2,7 @@ import '@leafer-in/editor'
 import '@leafer-in/text-editor'
 import '@leafer-in/view'
 import '@leafer-in/viewport'
+import '@leafer-in/export'
 import Tools, { INITIAL_HEIGHT, INITIAL_WIDTH } from './Tools'
 import { App, DragEvent, Text, Box, ZoomEvent } from 'leafer-ui'
 import type { ICursorType, ILeaf, IUIJSONData } from 'leafer-ui'
@@ -24,6 +25,7 @@ class DrawingBoard {
   public selectedGraphics: Ref<null | any> = ref(null)
   public clearGraphicsQueue = new Map<ILeaf, ILeaf>()
   public readonly leaferInstanceReadonly: null | App = null
+  public pageBox: null | Box = null
 
   public isSun = ref(
     window.localStorage.getItem(ENUM_LOCAL_KEY.THEME) === ENUM_LOCAL_VALUE.SUN ||
@@ -50,8 +52,6 @@ class DrawingBoard {
     watch(
       () => this.tools.toolbarActiveIndex.value,
       (newValue) => {
-        if (newValue !== 0) this.leaferInstance.config.move.drag = false
-        else this.leaferInstance.config.move.drag = true
         this.setEditorState(!newValue)
         this.setCursor()
       },
@@ -67,21 +67,12 @@ class DrawingBoard {
   }
 
   public activeIndexChange = (activeIndex: number) => {
+    if (activeIndex !== 0) this.leaferInstance.config.move.drag = false
+    else this.leaferInstance.config.move.drag = true
     this.tools.toolbarActiveIndex.value = activeIndex
   }
 
-  private initApp = (view: HTMLElement) => {
-    const app = new App({
-      view,
-      fill: '#4B3C31',
-      tree: {
-        type: 'design',
-      },
-      editor: {},
-      zoom: { min: 1, max: 16 },
-      move: { scroll: 'limit', drag: true },
-    })
-
+  private addPage = () => {
     const lineList: LineOrText[] = []
     for (let i = 1; i < 30; i++) {
       lineList.push({
@@ -109,8 +100,38 @@ class DrawingBoard {
       width: 816,
       fill: '#fbf0f0',
       children: lineList,
+      overflow: 'hide',
     })
+
+    return box
+  }
+
+  private initApp = (view: HTMLElement) => {
+    const app = new App({
+      view,
+      fill: '#4B3C31',
+      tree: {
+        type: 'design',
+      },
+      editor: {},
+      zoom: { min: 1, max: 16 },
+      move: { scroll: 'limit', drag: true },
+    })
+
+    const box = this.addPage()
+
+    this.pageBox = box
+
     app.tree.add(box)
+
+    const userBox = new Box({
+      x: 0,
+      y: 0,
+      height: 1056,
+      width: 816,
+      overflow: 'hide',
+    })
+    app.tree.add(userBox)
 
     app.tree.zoom('fit', 0, true)
     // 监听
@@ -183,7 +204,8 @@ class DrawingBoard {
       const graph = graphics.createdFactory!(x - INITIAL_WIDTH, y - INITIAL_HEIGHT)
 
       this.selectedGraphics.value = graph
-      this.leaferInstance.tree.add(graph)
+      console.log(this.leaferInstance.tree.children)
+      this.leaferInstance.tree.children[1].add(graph)
     })
 
   private mousemove = (e: DragEvent) =>
@@ -290,6 +312,16 @@ class DrawingBoard {
 
   historyUnBack = () => {
     this.setJson(this.history.getUnBackJson())
+  }
+
+  clearData = () => {
+    this.leaferInstanceReadonly.tree.clear()
+    const box = this.addPage()
+    this.leaferInstanceReadonly.tree.add(box)
+  }
+
+  downLoad = () => {
+    this.leaferInstanceReadonly.export('画板.png')
   }
 }
 

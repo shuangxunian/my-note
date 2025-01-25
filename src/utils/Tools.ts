@@ -171,39 +171,67 @@ export const toolBarOptions: IToolBarItem[] = [
     menuPlugins: [TextSize, TextColor],
   },
   {
-    icon: ERASER_TOOl_ICON,
+    icon: BRUSH_TOOl_ICON,
     name: 'eraserTool',
-    title: '橡皮擦',
-    cursor: 'grabbing',
-    isAfterRemove: true,
-    createdFactory: (x: number, y: number) =>
-      new Line({
+    title: '画笔',
+    strokeWidth: 3,
+    stroke: 'rgba(0, 0, 0, 1)',
+    createdFactory(x: number, y: number) {
+      const pen: Pen = new Pen({
+        name: 'eraserTool',
         x,
         y,
-        toPoint: { x: 0, y: 0 },
-        strokeWidth: 3,
-        stroke: 'rgba(0, 0, 0, 1)',
         editable: true,
-      }),
+        eraser: true,
+      })
 
-    onMousemove(e, drawingBoard) {
-      const { target } = drawingBoard.leaferInstanceReadonly.pick(
-        { x: e.x, y: e.y },
-        {
-          hitRadius: 2,
-        },
-      )!
-
-      if (!target) return
-
-      const has = drawingBoard.clearGraphicsQueue.has(target)
-
-      if (has) return
-
-      drawingBoard.clearGraphicsQueue.set(target, target)
-      target.opacity = 0.5
+      pen.setStyle({
+        stroke: this.stroke,
+        strokeWidth: this.strokeWidth,
+        strokeCap: 'round',
+        strokeJoin: 'round',
+      })
+      return pen
     },
+    onMousemove(e, drawingBoard, point) {
+      drawingBoard.selectedGraphics.value.lineTo(point.width, point.height)
+    },
+    menuPlugins: [LineSegmentSizePlugin, LineSegmentColorPlugin],
   },
+  // {
+  //   icon: ERASER_TOOl_ICON,
+  //   name: 'eraserTool',
+  //   title: '橡皮擦',
+  //   cursor: 'grabbing',
+  //   isAfterRemove: true,
+  //   createdFactory: (x: number, y: number) =>
+  //     new Line({
+  //       x,
+  //       y,
+  //       toPoint: { x: 0, y: 0 },
+  //       strokeWidth: 3,
+  //       stroke: 'rgba(0, 0, 0, 1)',
+  //       editable: true,
+  //     }),
+
+  //   onMousemove(e, drawingBoard) {
+  //     const { target } = drawingBoard.leaferInstanceReadonly.pick(
+  //       { x: e.x, y: e.y },
+  //       {
+  //         hitRadius: 2,
+  //       },
+  //     )!
+
+  //     if (!target) return
+
+  //     const has = drawingBoard.clearGraphicsQueue.has(target)
+
+  //     if (has) return
+
+  //     drawingBoard.clearGraphicsQueue.set(target, target)
+  //     target.opacity = 0.5
+  //   },
+  // },
 ]
 
 class Tools {
@@ -224,7 +252,7 @@ class Tools {
     const div = document.createElement('div')
     document.getElementById('app').append(div)
 
-    nextTick(() => render(h(Index), div))
+    // nextTick(() => render(h(Index), div))
   }
 
   public getActiveGraphics() {

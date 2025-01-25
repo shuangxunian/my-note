@@ -10,12 +10,38 @@ interface Page {
 }
 
 const router = useRouter()
-const items = ['Aim', 'EditPen', 'Plus', 'Minus']
+const items = [
+  'icon-xuanze',
+  'icon-bianji',
+  'icon-checkbox',
+  'icon-yuanxingweixuanzhong',
+  'icon-line',
+  'icon-bottom',
+  'icon-wenzi',
+  'icon-rubber',
+]
 const activeIndex = ref(0)
 const pageList = ref<Page[]>([])
+const leaferEditor = ref<HTMLElement | null>(null)
 
 const setActive = (index: number) => {
   activeIndex.value = index
+}
+
+const historyBack = () => {
+  leaferEditor.value.historyBack()
+}
+
+const historyUnBack = () => {
+  leaferEditor.value.historyUnBack()
+}
+
+const clearData = () => {
+  leaferEditor.value.clearData()
+}
+
+const downLoad = () => {
+  leaferEditor.value.downLoad()
 }
 
 const getPageList = async () => {
@@ -52,13 +78,27 @@ onMounted(async () => {
         <el-button @click="backHome">返回</el-button>
       </div>
       <div class="list">
+        <div class="each-type">
+          <i class="iconfont icon-left-1" @click="historyBack"></i>
+        </div>
+        <div class="each-type">
+          <i class="iconfont icon-right-1-copy" @click="historyUnBack"></i>
+        </div>
+        <div class="parting-line"></div>
         <div
           v-for="(item, index) in items"
           :key="index"
           :class="['each-type', { active: index === activeIndex }]"
           @click="setActive(index)"
         >
-          <i class="iconfont icon-bianji"></i>
+          <i class="iconfont" :class="item"></i>
+        </div>
+        <div class="parting-line"></div>
+        <div class="page-option each-type">
+          <i class="iconfont icon-shanchu" @click="clearData"></i>
+        </div>
+        <div class="page-option each-type">
+          <i class="iconfont icon-xiazai" @click="downLoad"></i>
         </div>
       </div>
       <div class="right">
@@ -74,7 +114,7 @@ onMounted(async () => {
         </div>
       </el-scrollbar>
       <div class="page-now">
-        <LeaferEditor :active-index="activeIndex" />
+        <LeaferEditor ref="leaferEditor" :active-index="activeIndex" />
       </div>
       <div class="page-option"></div>
     </div>
@@ -112,10 +152,19 @@ onMounted(async () => {
         cursor: pointer;
         transition: color 0.3s;
       }
+      .parting-line {
+        height: 20px;
+        border-left: 1px solid #999;
+      }
       .each-type.active {
         color: #000; /* 被选中的颜色深一点 */
         background-color: #eee;
         // border: 1px solid #333; /* 添加边框 */
+        border-radius: 4px; /* 可选：添加圆角 */
+      }
+      .each-type:hover {
+        color: #000; /* 被选中的颜色深一点 */
+        background-color: #eee;
         border-radius: 4px; /* 可选：添加圆角 */
       }
     }

@@ -54,6 +54,7 @@ export interface IUserDefinedData {
 export interface IAppProps {
   domId: string
   onChange?: (json: IUIJSONData) => void
+  activeIndexChange?: (newIndex: number) => void
   config?: {
     // 增加自定义工具栏
     toolbar?: Array<IToolBarItem>
