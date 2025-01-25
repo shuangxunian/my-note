@@ -10,6 +10,11 @@ declare module '@/utils/App' {
   interface AppInstance {
     init: (config: AppConfig) => void
     destroy: () => void
+    activeIndexChange: (newIndex: number) => void
+    historyBack: () => void
+    historyUnBack: () => void
+    clearData: (activeIndex: number) => void
+    downLoad: () => void
   }
 
   const App: AppInstance
