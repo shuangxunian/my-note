@@ -1,10 +1,29 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted, watch } from 'vue'
 import App from '@/utils/App'
 import { Star } from 'leafer-ui'
 import { INITIAL_HEIGHT, INITIAL_WIDTH } from '@/utils/Tools'
 import LineSegmentBackgroundColorPlugin from '@/components/plugins/LineSegmentBackgroundColorPlugin'
 import FIVE_POINTED_STAR_ICON from '@/assets/svg/wujiaoxing.svg'
+
+const props = withDefaults(
+  defineProps<{
+    activeIndex: number
+  }>(),
+  {
+    activeIndex: 0,
+  },
+)
+
+// 监听 activeIndex 的变化
+watch(
+  () => props.activeIndex,
+  (newIndex) => {
+    // debugger
+    App.activeIndexChange(newIndex)
+  },
+  { immediate: true }, // 立即执行一次
+)
 
 const fivePointedStar = {
   icon: FIVE_POINTED_STAR_ICON,

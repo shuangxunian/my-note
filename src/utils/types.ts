@@ -54,3 +54,31 @@ export interface IAppProps {
     toolbar?: Array<IToolBarItem>
   }
 }
+
+export interface ILine {
+  tag: 'Line'
+  x: number
+  y: number
+  width: number
+  strokeWidth: number
+  stroke: string
+}
+export interface IText {
+  tag: 'Text'
+  x: number
+  y: number
+  text: string
+  fill: string
+}
+
+export interface LineOrText {
+  tag: 'Line' | 'Text'
+  x: number
+  y: number
+  width?: number
+  height?: number
+  strokeWidth?: number
+  stroke?: string
+  fill?: string
+  text?: string
+}

@@ -2,13 +2,13 @@ import '@leafer-in/editor'
 import '@leafer-in/text-editor'
 import Tools, { INITIAL_HEIGHT, INITIAL_WIDTH } from './Tools'
 
-import { App, DragEvent, Text } from 'leafer-ui'
+import { App, DragEvent, Text, Box } from 'leafer-ui'
 import type { ICursorType, ILeaf, IUIJSONData } from 'leafer-ui'
 import { ref, toRef, watch } from 'vue'
 import type { Ref } from 'vue'
 import { EditorEvent } from '@leafer-in/editor'
 import History from './History'
-import type { IAppProps } from './types'
+import type { IAppProps, LineOrText } from './types'
 import { COLOR, ENUM_LOCAL_KEY, ENUM_LOCAL_VALUE } from './constant'
 
 class DrawingBoard {
@@ -61,12 +61,51 @@ class DrawingBoard {
     )
   }
 
+  public activeIndexChange = (activeIndex: number) => {
+    this.tools.toolbarActiveIndex.value = activeIndex
+  }
+
   private initApp = (view: HTMLElement) => {
     const app = new App({
       view,
-      fill: COLOR.WHITE,
+      fill: '#4B3C31',
+      tree: {
+        type: 'design',
+      },
       editor: {},
+      zoom: { min: 1, max: 16 },
+      move: { scroll: 'limit' },
     })
+
+    const lineList: LineOrText[] = []
+    for (let i = 1; i < 30; i++) {
+      lineList.push({
+        tag: 'Line',
+        x: 58,
+        y: 32 * i + 50,
+        width: 700,
+        strokeWidth: 1,
+        stroke: '#999',
+      })
+    }
+    for (let i = 1; i < 30; i++) {
+      lineList.push({
+        tag: 'Text',
+        x: 58,
+        y: 32 * i + 50,
+        text: i + '',
+        fill: 'black',
+      })
+    }
+    const box = new Box({
+      x: 0,
+      y: 0,
+      height: 1056,
+      width: 816,
+      fill: '#fbf0f0',
+      children: lineList,
+    })
+    app.tree.add(box)
 
     return app
   }
@@ -77,7 +116,7 @@ class DrawingBoard {
   }
 
   private onChangeTheme(val: boolean) {
-    this.leaferInstance.fill = val ? COLOR.WHITE : COLOR.BLACK
+    // this.leaferInstance.fill = val ? COLOR.WHITE : COLOR.BLACK
 
     window.localStorage.setItem(
       ENUM_LOCAL_KEY.THEME,

@@ -12,6 +12,14 @@ class App {
     })
   }
 
+  static activeIndexChange(newIndex: number) {
+    // debugger
+    // 实现方法逻辑
+    if (this.drawingBoardInstance) {
+      this.drawingBoardInstance.activeIndexChange(newIndex)
+    }
+  }
+
   static destroy() {
     if (this.drawingBoardInstance) {
       this.drawingBoardInstance.destroy()
