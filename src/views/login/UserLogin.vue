@@ -6,21 +6,21 @@ import { User, Lock } from '@element-plus/icons-vue'
 import router from '@/router'
 
 interface LoginForm {
-  username: string
+  userMail: string
   password: string
 }
 
 const loginForm = ref<LoginForm>({
-  username: '',
-  password: '',
+  userMail: 'test@gmail.com',
+  password: '123456',
 })
 
 const loginFormRef = ref<FormInstance>()
 
 const rules = ref<FormRules>({
-  username: [
-    { required: true, message: '请输入用户名', trigger: 'blur' },
-    { min: 3, max: 20, message: '用户名长度应在 3 到 20 个字符之间', trigger: 'blur' },
+  userMail: [
+    { required: true, message: '请输入邮箱', trigger: 'blur' },
+    { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] },
   ],
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
@@ -39,8 +39,8 @@ const handleLogin = async (formEl: FormInstance | undefined) => {
       loading.value = true
       // 这里添加实际的登录逻辑，token现在也只是用了用户名
       setTimeout(() => {
-        localStorage.setItem('user', loginForm.value.username)
-        localStorage.setItem('token', loginForm.value.username)
+        localStorage.setItem('user', loginForm.value.userMail)
+        localStorage.setItem('token', loginForm.value.userMail)
         ElMessage.success('登录成功')
         loading.value = false
         router.push('/main')
@@ -55,8 +55,8 @@ const handleLogin = async (formEl: FormInstance | undefined) => {
     <div class="login-box">
       <h2>系统登录</h2>
       <el-form ref="loginFormRef" :model="loginForm" :rules="rules" label-width="0" size="large">
-        <el-form-item prop="username">
-          <el-input v-model="loginForm.username" placeholder="用户名" :prefix-icon="User" />
+        <el-form-item prop="userMail">
+          <el-input v-model="loginForm.userMail" placeholder="邮箱" :prefix-icon="User" />
         </el-form-item>
         <el-form-item prop="password">
           <el-input
