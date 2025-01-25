@@ -4,7 +4,7 @@ import '@leafer-in/view'
 import '@leafer-in/viewport'
 import '@leafer-in/export'
 import Tools, { INITIAL_HEIGHT, INITIAL_WIDTH } from './Tools'
-import { App, DragEvent, Box, ZoomEvent, Group } from 'leafer-ui'
+import { App, DragEvent, Box, ZoomEvent, Group, Leaf } from 'leafer-ui'
 import type { ICursorType, ILeaf, IUIJSONData } from 'leafer-ui'
 import { ref, toRef, watch } from 'vue'
 import type { Ref } from 'vue'
@@ -217,8 +217,8 @@ class DrawingBoard {
       const graph = graphics.createdFactory!(x - INITIAL_WIDTH, y - INITIAL_HEIGHT)
 
       this.selectedGraphics.value = graph
-      // this.leaferInstance.tree.children[0].children[0].add(graph)
-      this.leaferInstance.tree.add(graph)
+      this.leaferInstance.tree.children[0].children[0].add(graph)
+      // this.leaferInstance.tree.add(graph)
     })
 
   private mousemove = (e: DragEvent) =>
@@ -342,8 +342,14 @@ class DrawingBoard {
   }
 
   downLoad = () => {
-    console.log('down')
-    this.leaferInstanceReadonly.export('画板.png')
+    this.leaferInstanceReadonly.set({
+      fill: '',
+    })
+    this.leaferInstanceReadonly.export('画板.png', { trim: true }).then(() => {
+      this.leaferInstanceReadonly.set({
+        fill: '#4B3C31',
+      })
+    })
   }
 }
 
