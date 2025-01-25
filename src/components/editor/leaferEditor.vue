@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, watch } from 'vue'
+import { onMounted, onUnmounted, watch, ref } from 'vue'
 import App from '@/utils/App'
 import { Star } from 'leafer-ui'
 import { INITIAL_HEIGHT, INITIAL_WIDTH } from '@/utils/Tools'
 import LineSegmentBackgroundColorPlugin from '@/components/plugins/LineSegmentBackgroundColorPlugin'
 import FIVE_POINTED_STAR_ICON from '@/assets/svg/wujiaoxing.svg'
+
+const leaferEditor = ref<HTMLElement | null>(null)
 
 const props = withDefaults(
   defineProps<{
@@ -61,6 +63,9 @@ onMounted(() =>
         // 五角星组件
         fivePointedStar,
       ],
+    },
+    userDefinedData: {
+      bodyWidth: leaferEditor.value?.offsetWidth || 0,
     },
     onChange: (json) => {
       console.log(json)

@@ -1,14 +1,15 @@
 import '@leafer-in/editor'
 import '@leafer-in/text-editor'
+import '@leafer-in/view'
+import '@leafer-in/viewport'
 import Tools, { INITIAL_HEIGHT, INITIAL_WIDTH } from './Tools'
-
-import { App, DragEvent, Text, Box } from 'leafer-ui'
+import { App, DragEvent, Text, Box, ZoomEvent } from 'leafer-ui'
 import type { ICursorType, ILeaf, IUIJSONData } from 'leafer-ui'
 import { ref, toRef, watch } from 'vue'
 import type { Ref } from 'vue'
 import { EditorEvent } from '@leafer-in/editor'
 import History from './History'
-import type { IAppProps, LineOrText } from './types'
+import type { IAppProps, LineOrText, IUserDefinedData } from './types'
 import { COLOR, ENUM_LOCAL_KEY, ENUM_LOCAL_VALUE } from './constant'
 
 class DrawingBoard {
@@ -16,6 +17,7 @@ class DrawingBoard {
   private rootDom: null | HTMLElement = null
   private isSelect = false
   private onChange: (json: IUIJSONData) => void = () => {}
+  private userDefinedData: IUserDefinedData = {}
   private history: null | History = null
 
   public tools: null | Tools = null
@@ -28,7 +30,7 @@ class DrawingBoard {
       !window.localStorage.getItem(ENUM_LOCAL_KEY.THEME),
   )
 
-  constructor({ domId, onChange, config }: IAppProps) {
+  constructor({ domId, onChange, config, userDefinedData }: IAppProps) {
     this.rootDom = document.getElementById(domId)
 
     if (!this.rootDom) {
@@ -37,6 +39,7 @@ class DrawingBoard {
     }
 
     if (onChange) this.onChange = onChange
+    if (userDefinedData) this.userDefinedData = userDefinedData
 
     this.leaferInstance = this.initApp(this.rootDom)
     this.leaferInstanceReadonly = this.leaferInstance
@@ -47,6 +50,8 @@ class DrawingBoard {
     watch(
       () => this.tools.toolbarActiveIndex.value,
       (newValue) => {
+        if (newValue !== 0) this.leaferInstance.config.move.drag = false
+        else this.leaferInstance.config.move.drag = true
         this.setEditorState(!newValue)
         this.setCursor()
       },
@@ -74,7 +79,7 @@ class DrawingBoard {
       },
       editor: {},
       zoom: { min: 1, max: 16 },
-      move: { scroll: 'limit' },
+      move: { scroll: 'limit', drag: true },
     })
 
     const lineList: LineOrText[] = []
@@ -106,6 +111,16 @@ class DrawingBoard {
       children: lineList,
     })
     app.tree.add(box)
+
+    app.tree.zoom('fit', 0, true)
+    // 监听
+    app.tree.on(ZoomEvent.END, (e: ZoomEvent) => {
+      // 如果外面的宽度大于当前这个组件的宽度才居中
+      if (this.userDefinedData.bodyWidth > app.tree.children[0].worldBoxBounds.width) {
+        // 居中逻辑
+        app?.tree.zoom('fit', 0, true)
+      }
+    })
 
     return app
   }
@@ -212,11 +227,13 @@ class DrawingBoard {
       this.clearGraphicsQueue.delete(graphics)
     })
 
-    this.tools.toolbarActiveIndex.value = 0
+    // this.tools.toolbarActiveIndex.value = 0
     this.selectedGraphics.value = null
 
     const isSave = this.history.save(this.leaferInstance.tree.toJSON())
-    isSave && this.onChange(this.leaferInstance.tree.toJSON())
+    if (isSave) {
+      this.onChange(this.leaferInstance.tree.toJSON())
+    }
   }
 
   private aop = (beforeHandler, afterHandler) => {

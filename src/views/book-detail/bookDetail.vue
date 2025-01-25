@@ -11,7 +11,7 @@ interface Page {
 
 const router = useRouter()
 const items = ['Aim', 'EditPen', 'Plus', 'Minus']
-const activeIndex = ref(1)
+const activeIndex = ref(0)
 const pageList = ref<Page[]>([])
 
 const setActive = (index: number) => {
@@ -58,7 +58,7 @@ onMounted(async () => {
           :class="['each-type', { active: index === activeIndex }]"
           @click="setActive(index)"
         >
-          <el-icon><component :is="item" /></el-icon>
+          <i class="iconfont icon-bianji"></i>
         </div>
       </div>
       <div class="right">

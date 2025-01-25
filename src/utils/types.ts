@@ -46,6 +46,11 @@ export interface IToolBarItem {
   [key: string]: any
 }
 
+export interface IUserDefinedData {
+  // 整个组件的宽度
+  bodyWidth?: number
+}
+
 export interface IAppProps {
   domId: string
   onChange?: (json: IUIJSONData) => void
@@ -53,6 +58,7 @@ export interface IAppProps {
     // 增加自定义工具栏
     toolbar?: Array<IToolBarItem>
   }
+  userDefinedData?: IUserDefinedData
 }
 
 export interface ILine {
