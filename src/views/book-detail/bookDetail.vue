@@ -80,33 +80,35 @@ onMounted(async () => {
       <div class="left">
         <el-button @click="backHome">返回</el-button>
       </div>
-      <div class="list">
-        <div class="each-type">
-          <i class="iconfont icon-left-1" @click="historyBack"></i>
-        </div>
-        <div class="each-type">
-          <i class="iconfont icon-right-1-copy" @click="historyUnBack"></i>
-        </div>
-        <div class="parting-line"></div>
-        <div
-          v-for="(item, index) in items"
-          :key="index"
-          :class="['each-type', { active: index === activeIndex }]"
-          @click="setActive(index)"
-        >
-          <i class="iconfont" :class="item"></i>
-        </div>
-        <div class="parting-line"></div>
-        <div class="page-option each-type">
-          <i class="iconfont icon-shanchu" @click="clearData"></i>
-        </div>
-        <div class="page-option each-type">
-          <i class="iconfont icon-xiazai" @click="downLoad"></i>
+      <div class="middle">
+        <div class="list">
+          <div class="each-type">
+            <i class="iconfont icon-left-1" @click="historyBack"></i>
+          </div>
+          <div class="each-type">
+            <i class="iconfont icon-right-1-copy" @click="historyUnBack"></i>
+          </div>
+          <div class="parting-line"></div>
+          <div
+            v-for="(item, index) in items"
+            :key="index"
+            :class="['each-type', { active: index === activeIndex }]"
+            @click="setActive(index)"
+          >
+            <i class="iconfont" :class="item"></i>
+          </div>
+          <div class="parting-line"></div>
+          <div class="page-option each-type">
+            <i class="iconfont icon-shanchu" @click="clearData"></i>
+          </div>
+          <div class="page-option each-type">
+            <i class="iconfont icon-xiazai" @click="downLoad"></i>
+          </div>
         </div>
       </div>
       <div class="right">
-        <!-- <el-switch v-model="isBlack" active-text="暗黑" inactive-text="雪白" @click="selectTheme" /> -->
-        <el-avatar> user </el-avatar>
+        <el-button>上一页</el-button>
+        <el-button>下一页</el-button>
       </div>
     </div>
     <div class="body">
@@ -140,36 +142,49 @@ onMounted(async () => {
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid #eee; /* 添加边框 */
-    .list {
+    .left {
+      width: 188px;
+    }
+    .middle {
       display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 6px;
-      .each-type {
-        height: 18px;
-        width: 14px;
+      // width: calc(100% - 550px);
+      gap: 10px;
+      .list {
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 4px 6px;
-        font-size: 14px; /* 文字小一点 */
-        color: #999; /* 颜色浅一点 */
-        cursor: pointer;
+        gap: 6px;
+        .each-type {
+          height: 18px;
+          width: 14px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 4px 6px;
+          font-size: 14px; /* 文字小一点 */
+          color: #999; /* 颜色浅一点 */
+          cursor: pointer;
+        }
+        .parting-line {
+          height: 20px;
+          border-left: 1px solid #999;
+        }
+        .each-type.active {
+          color: #000; /* 被选中的颜色深一点 */
+          background-color: #eee;
+          border-radius: 4px; /* 可选：添加圆角 */
+        }
+        .each-type:hover {
+          color: #000; /* 被选中的颜色深一点 */
+          background-color: #eee;
+          border-radius: 4px; /* 可选：添加圆角 */
+        }
       }
-      .parting-line {
-        height: 20px;
-        border-left: 1px solid #999;
-      }
-      .each-type.active {
-        color: #000; /* 被选中的颜色深一点 */
-        background-color: #eee;
-        border-radius: 4px; /* 可选：添加圆角 */
-      }
-      .each-type:hover {
-        color: #000; /* 被选中的颜色深一点 */
-        background-color: #eee;
-        border-radius: 4px; /* 可选：添加圆角 */
-      }
+    }
+    .right {
+      width: 338px;
+      display: flex;
+      justify-content: space-around;
     }
   }
   .body {
