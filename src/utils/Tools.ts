@@ -173,7 +173,7 @@ export const toolBarOptions: IToolBarItem[] = [
   {
     icon: BRUSH_TOOl_ICON,
     name: 'eraserTool',
-    title: '画笔',
+    title: '橡皮',
     strokeWidth: 3,
     stroke: 'rgba(0, 0, 0, 1)',
     createdFactory(x: number, y: number) {

@@ -192,7 +192,7 @@ onMounted(async () => {
     width: 100%;
     display: flex;
     .page-list {
-      min-width: 200px;
+      width: 200px;
       overflow: auto;
       .page-item {
         padding: 0 auto;
@@ -220,7 +220,7 @@ onMounted(async () => {
       min-width: 816px;
     }
     .page-option {
-      min-width: 350px;
+      width: 350px;
     }
   }
 }

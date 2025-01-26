@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import toolsIndex from './tools-components/toolsIndex.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -44,7 +45,7 @@ onMounted(async () => {})
       </div>
     </div>
     <el-scrollbar class="body">
-      <div>123</div>
+      <toolsIndex :active-index="activeIndex" />
     </el-scrollbar>
   </div>
 </template>
@@ -81,7 +82,7 @@ onMounted(async () => {})
     }
   }
   .body {
-    flex: 1;
+    // flex: 1;
     // height: calc(100% -40px);
     overflow: auto;
   }

@@ -319,6 +319,10 @@ class DrawingBoard {
     )
   }
 
+  changeDisposition = (type: string, val) => {
+    this.getSelectedGraphics().value[type] = val
+  }
+
   setJson = (json: IUIJSONData | null) => {
     if (!json) return
     this.leaferInstance.tree.set({ children: json.children })
