@@ -59,6 +59,13 @@ class App {
       this.drawingBoardInstance.destroy()
     }
   }
+
+  // 添加 changeDisposition 方法
+  static changeDisposition(type: string, value: string | number) {
+    if (this.drawingBoardInstance) {
+      this.drawingBoardInstance.changeDisposition(type, value)
+    }
+  }
 }
 
 export default App

@@ -15,6 +15,7 @@ declare module '@/utils/App' {
     historyUnBack: () => void
     clearData: (activeIndex: number) => void
     downLoad: () => void
+    changeDisposition: (type: string, value: string | number) => void
   }
 
   const App: AppInstance

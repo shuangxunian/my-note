@@ -1,16 +1,23 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
+import App from '@/utils/App'
 
-const strokeWidth = ref<number>(0)
+const strokeWidth = ref<number>(1)
 const stroke = ref<string>('#000000')
 
 const colorChange = () => {
   if (!stroke.value) stroke.value = '#000000'
-  // console.log(stroke.value)
-  // stroke.value = '#000000'
+  App.changeDisposition('stroke', stroke.value)
 }
 
-onMounted(async () => {})
+watch(strokeWidth, (newWidth) => {
+  App.changeDisposition('strokeWidth', newWidth)
+})
+
+onMounted(() => {
+  App.changeDisposition('stroke', stroke.value)
+  App.changeDisposition('strokeWidth', strokeWidth.value)
+})
 </script>
 
 <template>
