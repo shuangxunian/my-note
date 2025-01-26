@@ -63,7 +63,7 @@ export const toolBarOptions: IToolBarItem[] = [
     title: '矩形',
     strokeWidth: 2,
     stroke: 'rgba(0, 0, 0, 1)',
-    // fill: COLOR.WHITE,
+    fill: '',
     createdFactory(x: number, y: number) {
       return new Rect({
         name: 'rectTool',
@@ -85,7 +85,7 @@ export const toolBarOptions: IToolBarItem[] = [
     title: '椭圆',
     strokeWidth: 2,
     stroke: 'rgba(0, 0, 0, 1)',
-    fill: COLOR.WHITE,
+    fill: '',
     createdFactory(x: number, y: number) {
       return new Ellipse({
         name: 'ellipseTool',
@@ -97,7 +97,7 @@ export const toolBarOptions: IToolBarItem[] = [
         editable: true,
         strokeWidth: this.strokeWidth,
         stroke: this.stroke,
-        // fill: this.fill,
+        fill: this.fill,
       })
     },
 
