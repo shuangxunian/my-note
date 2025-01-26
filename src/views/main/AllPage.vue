@@ -1,20 +1,26 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import img from '@/assets/img/image.png'
-import { VueDraggable } from 'vue-draggable-plus'
+import payImg from '@/assets/img/pay-img.jpg'
 import { useRouter } from 'vue-router'
-
-interface Book {
-  bookID: string
-  bookName: string
-  img: string
-}
+import IndexDB from '@/utils/IndexDB'
+import { ElMessage } from 'element-plus'
+import type { IBook } from '@/types/book'
 
 const isBlack = ref(false)
 const items = ['我的', '收藏', '商城']
 const activeIndex = ref(0)
-const bookList = ref<Book[]>([])
+const bookList = ref<IBook[]>([])
+const buyNoteDialog = ref(false)
+const payImgDialog = ref(false)
 const router = useRouter()
+const db = new IndexDB('myNoteDB')
+const form = ref({
+  bookName: '未命名笔记',
+  pageNum: 50,
+  img: img,
+  des: '',
+})
 
 const selectTheme = () => {
   const html = document.documentElement
@@ -32,24 +38,46 @@ const setActive = (index: number) => {
 }
 
 const getBookList = async () => {
-  const data = [
-    {
-      bookID: '1',
-      bookName: 'book1',
-      img: img,
-    },
-    {
-      bookID: '2',
-      bookName: 'book2',
-      img: img,
-    },
-    {
-      bookID: '3',
-      bookName: 'book3',
-      img: img,
-    },
-  ]
-  bookList.value = data
+  try {
+    // 尝试从 IndexedDB 获取数据
+    const books = await db.getAllBooks()
+    bookList.value = books
+  } catch (error) {
+    console.error('获取书籍列表失败:', error)
+    ElMessage.error('获取书籍列表失败')
+  }
+}
+
+const addNewBook = async () => {
+  try {
+    const newBook: IBook = {
+      ...form.value,
+      bookID: Date.now().toString(), // 使用时间戳作为ID
+    }
+    await db.addBook(newBook)
+    bookList.value.push(newBook)
+    ElMessage.success('添加成功')
+  } catch (error) {
+    console.error('添加书籍失败:', error)
+    ElMessage.error('添加书籍失败')
+  }
+}
+
+const buyNote = () => {
+  buyNoteDialog.value = true
+}
+
+// 打开支付
+const payImgDialogShow = () => {
+  payImgDialog.value = true
+}
+
+// 支付完成
+const finishPay = async () => {
+  ElMessage.success('支付成功，感谢您的支持~')
+  payImgDialog.value = false
+  buyNoteDialog.value = false
+  addNewBook()
 }
 
 const toBookDetail = () => {
@@ -63,8 +91,8 @@ const breakUser = () => {
 }
 
 onMounted(async () => {
+  await db.initDB()
   isBlack.value = localStorage.getItem('theme') === 'dark'
-  selectTheme()
   getBookList()
 })
 </script>
@@ -92,22 +120,58 @@ onMounted(async () => {
     </div>
     <div class="body">
       <div class="book-page">
-        <VueDraggable ref="el" v-model="bookList" handle=".handle" class="book-list">
+        <div class="book-list">
           <div class="each-book">
-            <div class="book add-book">+</div>
-            <div class="text">添加书籍</div>
+            <div class="book add-book" @click="buyNote">+</div>
+            <div class="text">购买新笔记</div>
           </div>
           <div v-for="book in bookList" :key="book.bookID" class="each-book handle">
             <img class="book" :src="book.img" alt="" @click="toBookDetail" />
             <div class="text">{{ book.bookName }}</div>
           </div>
-        </VueDraggable>
-        <!-- <div v-for="book in bookList" :key="book.bookID" class="each-book">
-          <img class="book" :src="book.img" alt="" />
-          <div class="text">{{ book.bookName }}</div>
-        </div> -->
+        </div>
       </div>
     </div>
+    <el-dialog v-model="buyNoteDialog" title="购买新笔记" width="500">
+      <el-form :model="form" label-width="auto" style="max-width: 600px">
+        <el-form-item label="笔记封面">
+          <img class="upload-note-page" :src="form.img" alt="" />
+        </el-form-item>
+        <el-form-item label="笔记名">
+          <el-input v-model="form.bookName" />
+        </el-form-item>
+        <el-form-item label="页数">
+          <el-radio-group v-model="form.pageNum">
+            <el-radio :value="50">50</el-radio>
+            <el-radio :value="100">100</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="描述">
+          <el-input v-model="form.des" type="textarea" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="buyNoteDialog = false">取消</el-button>
+          <el-button type="primary" @click="payImgDialogShow">支付</el-button>
+        </div>
+      </template>
+    </el-dialog>
+    <el-dialog v-model="payImgDialog" title="付款" width="500">
+      <div class="pay-page">
+        <p class="pay-text">您需支付：{{ form.pageNum === 50 ? 4 : 8 }}元</p>
+        <p class="pay-memo">
+          此弹窗是给后续的在线版本支付留入口，离线版请直接点支付完成即可；如您愿意支持我，请在备注中留下您的邮箱，在在线版上线后会送您一定的笔记~
+        </p>
+        <img class="pay-img" :src="payImg" alt="" />
+      </div>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="payImgDialog = false">取消</el-button>
+          <el-button type="primary" @click="finishPay">支付完成</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -193,6 +257,29 @@ onMounted(async () => {
         }
       }
     }
+  }
+}
+.upload-note-page {
+  width: 78px;
+  height: 111px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.pay-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  .pay-text {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+  }
+  .pay-memo {
+  }
+  .pay-img {
+    width: 300px;
+    // height: 111px;
   }
 }
 </style>

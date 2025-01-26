@@ -53,7 +53,7 @@ const handleLogin = async (formEl: FormInstance | undefined) => {
 <template>
   <div class="login-container">
     <div class="login-box">
-      <h2>我言</h2>
+      <p class="title">我言</p>
       <el-form ref="loginFormRef" :model="loginForm" :rules="rules" label-width="0" size="large">
         <el-form-item prop="userMail">
           <el-input v-model="loginForm.userMail" placeholder="邮箱" :prefix-icon="User" />
@@ -97,10 +97,11 @@ const handleLogin = async (formEl: FormInstance | undefined) => {
     border-radius: 8px;
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 
-    h2 {
+    .title {
+      font-size: 24px;
+      font-weight: bold;
       text-align: center;
-      margin-bottom: 30px;
-      color: #333;
+      margin-bottom: 40px;
     }
 
     .login-button {
