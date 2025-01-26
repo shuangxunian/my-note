@@ -97,7 +97,7 @@ export const toolBarOptions: IToolBarItem[] = [
         editable: true,
         strokeWidth: this.strokeWidth,
         stroke: this.stroke,
-        fill: this.fill,
+        // fill: this.fill,
       })
     },
 
