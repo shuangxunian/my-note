@@ -1,5 +1,6 @@
 import DrawingBoard from './DrawingBoard'
 import type { IAppProps } from './types'
+import { watch } from 'vue'
 
 class App {
   static drawingBoardInstance: null | DrawingBoard = null
@@ -64,6 +65,23 @@ class App {
   static changeDisposition(type: string, value: string | number) {
     if (this.drawingBoardInstance) {
       this.drawingBoardInstance.changeDisposition(type, value)
+    }
+  }
+
+  // 添加获取 selectedGraphics 的方法
+  static getSelectedGraphics() {
+    if (this.drawingBoardInstance) {
+      return this.drawingBoardInstance.selectedGraphics
+    }
+    return null
+  }
+
+  // 添加监听 selectedGraphics 变化的方法
+  static onSelectedGraphicsChange(callback: (value: any) => void) {
+    if (this.drawingBoardInstance) {
+      watch(this.drawingBoardInstance.selectedGraphics, (newValue) => {
+        callback(newValue)
+      })
     }
   }
 }

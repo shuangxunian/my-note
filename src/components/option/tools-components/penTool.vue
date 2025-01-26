@@ -5,6 +5,21 @@ import App from '@/utils/App'
 const strokeWidth = ref<number>(1)
 const stroke = ref<string>('#000000')
 
+const props = defineProps<{
+  selectedGraphics: any
+}>()
+
+watch(
+  () => props.selectedGraphics,
+  (newValue) => {
+    if (newValue) {
+      stroke.value = newValue.stroke || '#000000'
+      strokeWidth.value = newValue.strokeWidth || 1
+    }
+  },
+  { immediate: true },
+)
+
 const colorChange = () => {
   if (!stroke.value) stroke.value = '#000000'
   App.changeDisposition('stroke', stroke.value)

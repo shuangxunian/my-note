@@ -5,6 +5,21 @@ import App from '@/utils/App'
 const fontSize = ref<number>(24)
 const fill = ref<string>('#000000')
 
+const props = defineProps<{
+  selectedGraphics: any
+}>()
+
+watch(
+  () => props.selectedGraphics,
+  (newValue) => {
+    if (newValue) {
+      fontSize.value = newValue.fontSize || 24
+      fill.value = newValue.fill || '#000000'
+    }
+  },
+  { immediate: true },
+)
+
 const colorChange = () => {
   if (!fill.value) fill.value = '#000000'
   App.changeDisposition('fill', fill.value)

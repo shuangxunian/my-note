@@ -6,6 +6,22 @@ const strokeWidth = ref<number>(1)
 const stroke = ref<string>('#000000')
 const fill = ref<string | null>(null)
 
+const props = defineProps<{
+  selectedGraphics: any
+}>()
+
+watch(
+  () => props.selectedGraphics,
+  (newValue) => {
+    if (newValue) {
+      strokeWidth.value = newValue.strokeWidth || 1
+      stroke.value = newValue.stroke
+      fill.value = newValue.fill || null
+    }
+  },
+  { immediate: true },
+)
+
 const strokeColorChange = () => {
   // 只有两个都为null时才必须存在边框
   if (!stroke.value && !fill.value) stroke.value = '#000000'

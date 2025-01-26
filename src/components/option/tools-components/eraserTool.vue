@@ -4,6 +4,20 @@ import App from '@/utils/App'
 
 const strokeWidth = ref<number>(1)
 
+const props = defineProps<{
+  selectedGraphics: any
+}>()
+
+watch(
+  () => props.selectedGraphics,
+  (newValue) => {
+    if (newValue) {
+      strokeWidth.value = newValue.strokeWidth || 1
+    }
+  },
+  { immediate: true },
+)
+
 watch(strokeWidth, (newWidth) => {
   App.changeDisposition('strokeWidth', newWidth)
 })
