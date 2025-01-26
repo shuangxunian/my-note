@@ -210,6 +210,8 @@ class DrawingBoard {
 
   private mousedown = (e: DragEvent) =>
     this.aop(null, () => {
+      if ([8].includes(this.tools.toolbarActiveIndex.value)) return
+
       const { x, y } = e.getPage()
 
       const graphics = this.tools.getActiveGraphics()

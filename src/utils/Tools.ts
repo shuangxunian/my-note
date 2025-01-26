@@ -198,40 +198,11 @@ export const toolBarOptions: IToolBarItem[] = [
     },
     menuPlugins: [LineSegmentSizePlugin, LineSegmentColorPlugin],
   },
-  // {
-  //   icon: ERASER_TOOl_ICON,
-  //   name: 'eraserTool',
-  //   title: '橡皮擦',
-  //   cursor: 'grabbing',
-  //   isAfterRemove: true,
-  //   createdFactory: (x: number, y: number) =>
-  //     new Line({
-  //       x,
-  //       y,
-  //       toPoint: { x: 0, y: 0 },
-  //       strokeWidth: 3,
-  //       stroke: 'rgba(0, 0, 0, 1)',
-  //       editable: true,
-  //     }),
-
-  //   onMousemove(e, drawingBoard) {
-  //     const { target } = drawingBoard.leaferInstanceReadonly.pick(
-  //       { x: e.x, y: e.y },
-  //       {
-  //         hitRadius: 2,
-  //       },
-  //     )!
-
-  //     if (!target) return
-
-  //     const has = drawingBoard.clearGraphicsQueue.has(target)
-
-  //     if (has) return
-
-  //     drawingBoard.clearGraphicsQueue.set(target, target)
-  //     target.opacity = 0.5
-  //   },
-  // },
+  {
+    icon: SELECT_TOOl_ICON,
+    name: 'dragTool',
+    title: '拖拽',
+  },
 ]
 
 class Tools {
