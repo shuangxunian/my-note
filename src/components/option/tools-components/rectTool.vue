@@ -24,8 +24,6 @@ onMounted(() => {
   App.changeDisposition('stroke', stroke.value)
   App.changeDisposition('strokeWidth', strokeWidth.value)
 })
-
-onMounted(async () => {})
 </script>
 
 <template>
