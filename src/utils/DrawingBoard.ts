@@ -340,7 +340,13 @@ class DrawingBoard {
   clearData = () => {
     this.leaferInstanceReadonly.tree.clear()
     const box = this.addPage()
-    this.leaferInstanceReadonly.tree.add(box)
+    this.leaferInstanceReadonly.tree.add(
+      new Group({
+        x: 0,
+        y: 0,
+        children: [box],
+      }),
+    )
   }
 
   downLoad = () => {
