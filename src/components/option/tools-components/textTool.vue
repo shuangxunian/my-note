@@ -1,14 +1,54 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
+import App from '@/utils/App'
 
-onMounted(async () => {})
+const fontSize = ref<number>(24)
+const fill = ref<string>('#000000')
+
+const colorChange = () => {
+  if (!fill.value) fill.value = '#000000'
+  App.changeDisposition('fill', fill.value)
+}
+
+watch(fontSize, (newWidth) => {
+  App.changeDisposition('fontSize', newWidth)
+})
+
+onMounted(() => {
+  App.changeDisposition('fill', fill.value)
+  App.changeDisposition('fontSize', fontSize.value)
+})
 </script>
 
 <template>
-  <div class="text-tool">text-tool</div>
+  <div class="text-tool">
+    <div class="setting">
+      <p>文字大小</p>
+      <div class="slider">
+        <el-slider v-model="fontSize" :min="12" :max="48" />
+      </div>
+    </div>
+    <div class="setting">
+      <p>文字颜色</p>
+      <div class="picker">
+        <el-color-picker v-model="fill" @change="colorChange" />
+      </div>
+    </div>
+  </div>
 </template>
 
 <style lang="less" scoped>
 .text-tool {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  .setting {
+    .slider {
+      margin: 0 10px;
+    }
+    .picker {
+      margin-top: 6px;
+    }
+  }
 }
 </style>

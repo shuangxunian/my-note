@@ -162,7 +162,7 @@ export const toolBarOptions: IToolBarItem[] = [
         width: 200,
         height: 35,
         y: y - 10,
-        text: '请双击编辑内容',
+        text: '请切换成选择后编辑内容',
         fontSize: this.fontSize,
         fill: this.fill,
         editable: true,
