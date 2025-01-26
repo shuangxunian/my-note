@@ -27,7 +27,6 @@ export default class IndexDB {
         if (!db.objectStoreNames.contains('books')) {
           const store = db.createObjectStore('books', { keyPath: 'bookID' })
           store.createIndex('bookName', 'bookName', { unique: false })
-          store.createIndex('img', 'img', { unique: false })
         }
       }
     })

@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import img from '@/assets/img/image.png'
 import payImg from '@/assets/img/pay-img.jpg'
+import avatar from '@/assets/img/avatar.jpg'
 import { useRouter } from 'vue-router'
 import IndexDB from '@/utils/IndexDB'
 import { ElMessage } from 'element-plus'
@@ -13,6 +14,7 @@ const activeIndex = ref(0)
 const bookList = ref<IBook[]>([])
 const buyNoteDialog = ref(false)
 const payImgDialog = ref(false)
+const userInfoDialog = ref(false)
 const router = useRouter()
 const db = new IndexDB('myNoteDB')
 const form = ref({
@@ -80,8 +82,14 @@ const finishPay = async () => {
   addNewBook()
 }
 
+// 跳转到笔记详情页
 const toBookDetail = () => {
   router.push('/bookDetail')
+}
+
+// 跳转到用户信息页
+const toUserInfo = () => {
+  userInfoDialog.value = true
 }
 
 const breakUser = () => {
@@ -115,12 +123,14 @@ onMounted(async () => {
       </div>
       <div class="right">
         <!-- <el-switch v-model="isBlack" active-text="暗黑" inactive-text="雪白" @click="selectTheme" /> -->
-        <el-avatar> user </el-avatar>
+        <el-avatar class="user-info" @click="toUserInfo">
+          <img :src="avatar" alt="" />
+        </el-avatar>
       </div>
     </div>
     <div class="body">
       <div class="book-page">
-        <div class="book-list">
+        <div v-if="activeIndex === 0" class="book-list">
           <div class="each-book">
             <div class="book add-book" @click="buyNote">+</div>
             <div class="text">购买新笔记</div>
@@ -129,6 +139,9 @@ onMounted(async () => {
             <img class="book" :src="book.img" alt="" @click="toBookDetail" />
             <div class="text">{{ book.bookName }}</div>
           </div>
+        </div>
+        <div v-else class="book-list">
+          <p>离线版本不开放此功能</p>
         </div>
       </div>
     </div>
@@ -165,6 +178,14 @@ onMounted(async () => {
         </p>
         <img class="pay-img" :src="payImg" alt="" />
       </div>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="payImgDialog = false">取消</el-button>
+          <el-button type="primary" @click="finishPay">支付完成</el-button>
+        </div>
+      </template>
+    </el-dialog>
+    <el-dialog v-model="userInfoDialog" title="个人信息" width="800">
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="payImgDialog = false">取消</el-button>
@@ -212,6 +233,9 @@ onMounted(async () => {
       align-items: center;
       justify-content: space-between;
       gap: 8px;
+      .user-info {
+        cursor: pointer;
+      }
     }
   }
   .body {
