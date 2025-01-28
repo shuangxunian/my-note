@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import toolsIndex from './tools-components/toolsIndex.vue'
+import pagesIndex from './pages-components/pagesIndex.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -21,6 +22,11 @@ const items = [
     index: 1,
     name: '页面配置',
     type: 'page',
+  },
+  {
+    index: 2,
+    name: '全局配置',
+    type: 'global',
   },
 ]
 const activeOption = ref(0)
@@ -45,7 +51,8 @@ onMounted(async () => {})
       </div>
     </div>
     <el-scrollbar class="body">
-      <toolsIndex :active-index="activeIndex" />
+      <toolsIndex v-if="activeOption === 0" :active-index="props.activeIndex" />
+      <pagesIndex v-else :is-global="activeOption === 2" />
     </el-scrollbar>
   </div>
 </template>

@@ -4,9 +4,10 @@ import img from '@/assets/img/image.png'
 import payImg from '@/assets/img/pay-img.jpg'
 import avatar from '@/assets/img/avatar.jpg'
 import { useRouter } from 'vue-router'
-import IndexDB from '@/utils/IndexDB'
+import { addBook, getAllBooks } from '@/utils/IndexDB'
 import { ElMessage } from 'element-plus'
 import type { IBook } from '@/types/book'
+import UserInfo from './conponents/userInfo.vue'
 
 const isBlack = ref(false)
 const items = ['我的', '收藏', '商城']
@@ -16,7 +17,6 @@ const buyNoteDialog = ref(false)
 const payImgDialog = ref(false)
 const userInfoDialog = ref(false)
 const router = useRouter()
-const db = new IndexDB('myNoteDB')
 const form = ref({
   bookName: '未命名笔记',
   pageNum: 50,
@@ -41,8 +41,7 @@ const setActive = (index: number) => {
 
 const getBookList = async () => {
   try {
-    // 尝试从 IndexedDB 获取数据
-    const books = await db.getAllBooks()
+    const books = await getAllBooks()
     bookList.value = books
   } catch (error) {
     console.error('获取书籍列表失败:', error)
@@ -50,18 +49,25 @@ const getBookList = async () => {
   }
 }
 
-const addNewBook = async () => {
+const handleAddBook = async () => {
   try {
-    const newBook: IBook = {
-      ...form.value,
-      bookID: Date.now().toString(), // 使用时间戳作为ID
+    const newBook = {
+      bookID: Date.now().toString(),
+      bookName: form.value.bookName,
+      pageNum: form.value.pageNum,
+      img: form.value.img,
+      des: form.value.des,
+      globalType: {
+        appFill: '#4B3C31',
+        pageFill: '#fbf0f0',
+        pageType: 1,
+      },
     }
-    await db.addBook(newBook)
+    await addBook(newBook)
     bookList.value.push(newBook)
-    ElMessage.success('添加成功')
+    // ElMessage.success('添加成功')
   } catch (error) {
-    console.error('添加书籍失败:', error)
-    ElMessage.error('添加书籍失败')
+    ElMessage.error(error)
   }
 }
 
@@ -79,11 +85,18 @@ const finishPay = async () => {
   ElMessage.success('支付成功，感谢您的支持~')
   payImgDialog.value = false
   buyNoteDialog.value = false
-  addNewBook()
+  handleAddBook()
+}
+
+// 保存个人信息的修改
+const saveUserInfoChange = async () => {
+  ElMessage.success('保存成功')
+  userInfoDialog.value = false
 }
 
 // 跳转到笔记详情页
-const toBookDetail = () => {
+const toBookDetail = (book) => {
+  localStorage.setItem('bookInfo', JSON.stringify(book))
   router.push('/bookDetail')
 }
 
@@ -99,7 +112,6 @@ const breakUser = () => {
 }
 
 onMounted(async () => {
-  await db.initDB()
   isBlack.value = localStorage.getItem('theme') === 'dark'
   getBookList()
 })
@@ -136,7 +148,7 @@ onMounted(async () => {
             <div class="text">购买新笔记</div>
           </div>
           <div v-for="book in bookList" :key="book.bookID" class="each-book handle">
-            <img class="book" :src="book.img" alt="" @click="toBookDetail" />
+            <img class="book" :src="book.img" alt="" @click="toBookDetail(book)" />
             <div class="text">{{ book.bookName }}</div>
           </div>
         </div>
@@ -186,10 +198,11 @@ onMounted(async () => {
       </template>
     </el-dialog>
     <el-dialog v-model="userInfoDialog" title="个人信息" width="800">
+      <UserInfo />
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="payImgDialog = false">取消</el-button>
-          <el-button type="primary" @click="finishPay">支付完成</el-button>
+          <el-button @click="userInfoDialog = false">关闭</el-button>
+          <el-button type="primary" @click="saveUserInfoChange">保存更改</el-button>
         </div>
       </template>
     </el-dialog>

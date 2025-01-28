@@ -24,6 +24,7 @@ declare module '@/utils/App' {
     clearData: (activeIndex: number) => void
     downLoad: () => void
     changeDisposition: (type: string, value: string | number) => void
+    changePageDisposition: (type: string, value: string | number) => void
     // 添加这两个新方法的类型定义
     getSelectedGraphics: () => { value: ISelectedGraphics | null }
     onSelectedGraphicsChange: (callback: (value: ISelectedGraphics | null) => void) => void

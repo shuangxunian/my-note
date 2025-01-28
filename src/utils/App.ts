@@ -61,10 +61,17 @@ class App {
     }
   }
 
-  // 添加 changeDisposition 方法
+  // 修改工具样式
   static changeDisposition(type: string, value: string | number) {
     if (this.drawingBoardInstance) {
       this.drawingBoardInstance.changeDisposition(type, value)
+    }
+  }
+
+  // 修改页面 单页/全局 样式
+  static changePageDisposition(type: string, value: string | number) {
+    if (this.drawingBoardInstance) {
+      this.drawingBoardInstance.changePageDisposition(type, value)
     }
   }
 

@@ -82,6 +82,9 @@ export interface LineOrText {
   tag: 'Line' | 'Text'
   x: number
   y: number
+  zIndex?: number
+  className?: string
+  rotation?: number
   width?: number
   height?: number
   strokeWidth?: number

@@ -3,6 +3,7 @@ import '@leafer-in/text-editor'
 import '@leafer-in/view'
 import '@leafer-in/viewport'
 import '@leafer-in/export'
+import '@leafer-in/find'
 import Tools, { INITIAL_HEIGHT, INITIAL_WIDTH } from './Tools'
 import { App, DragEvent, Box, ZoomEvent, Group, Leaf } from 'leafer-ui'
 import type { ICursorType, ILeaf, IUIJSONData } from 'leafer-ui'
@@ -72,34 +73,46 @@ class DrawingBoard {
     this.tools.toolbarActiveIndex.value = activeIndex
   }
 
-  private addPage = () => {
+  private getPageLine = (type: number = 1) => {
+    if (type === 0) return []
     const lineList: LineOrText[] = []
-    for (let i = 1; i < 30; i++) {
+    for (let i = 0; i < 30; i++) {
       lineList.push({
         tag: 'Line',
-        x: 58,
-        y: 32 * i + 50,
-        width: 700,
+        x: 56,
+        y: 80 + 32 * i,
+        className: 'pageLine',
+        zIndex: 0,
+        width: 704,
         strokeWidth: 1,
         stroke: '#999',
       })
     }
-    for (let i = 1; i < 30; i++) {
-      lineList.push({
-        tag: 'Text',
-        x: 58,
-        y: 32 * i + 50,
-        text: i + '',
-        fill: 'black',
-      })
+    if (type === 2) {
+      for (let i = 0; i < 23; i++) {
+        lineList.push({
+          tag: 'Line',
+          rotation: 90,
+          x: 56 + 32 * i,
+          y: 80,
+          className: 'pageLine',
+          zIndex: 0,
+          width: 928,
+          strokeWidth: 1,
+          stroke: '#999',
+        })
+      }
     }
+    return lineList
+  }
+  private addPage = () => {
     const box = new Box({
       x: 0,
       y: 0,
       height: 1056,
       width: 816,
       fill: '#fbf0f0',
-      children: lineList,
+      children: this.getPageLine(1),
       overflow: 'hide',
     })
 
@@ -123,7 +136,7 @@ class DrawingBoard {
 
     const pageBox = this.addPage()
     const userBox = this.addPage()
-    this.pageBox = pageBox
+    // this.pageBox = pageBox
     app.ground.add(pageBox)
     app.tree.add(
       new Group({
@@ -220,7 +233,6 @@ class DrawingBoard {
 
       this.selectedGraphics.value = graph
       this.leaferInstance.tree.children[0].children[0].add(graph)
-      // this.leaferInstance.tree.add(graph)
     })
 
   private mousemove = (e: DragEvent) =>
@@ -321,6 +333,40 @@ class DrawingBoard {
 
   changeDisposition = (type: string, val) => {
     this.getSelectedGraphics().value[type] = val
+  }
+
+  appFillChange = (val) => {
+    this.leaferInstance.set({
+      fill: val,
+    })
+  }
+  pageFillChange = (val) => {
+    this.leaferInstance.tree.children[0].children[0].set({
+      fill: val,
+    })
+    this.leaferInstance.ground.children[0].children[0].set({
+      fill: val,
+    })
+  }
+  pageTypeChange = (val) => {
+    this.leaferInstance.find('.pageLine').forEach((item) => {
+      item.remove()
+    })
+    const lineList: LineOrText[] = this.getPageLine(val)
+    this.leaferInstance.tree.children[0].children[0].add(lineList)
+  }
+
+  private funMap = {
+    appFill: this.appFillChange,
+    pageFill: this.pageFillChange,
+    pageType: this.pageTypeChange,
+  }
+
+  // 修改页面层面的数据
+  changePageDisposition = (type: string, val) => {
+    if (this.funMap[type]) {
+      this.funMap[type](val)
+    }
   }
 
   setJson = (json: IUIJSONData | null) => {

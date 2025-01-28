@@ -3,14 +3,14 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import LeaferEditor from '@/components/editor/leaferEditor.vue'
 import LeaferOption from '@/components/option/leaferOption.vue'
-import img from '@/assets/img/image.png'
+import img from '@/assets/img/default-page.png'
 
-interface Page {
-  pageID: string
-  img: string
-}
+import { ElMessage } from 'element-plus'
+import type { IBook, IPage } from '@/types/book'
+import { getAllPage } from '@/utils/IndexDB'
 
 const router = useRouter()
+
 const items = [
   'icon-xuanze',
   'icon-bianji',
@@ -23,9 +23,10 @@ const items = [
   'icon-tuozhuai',
 ]
 const activeIndex = ref(0)
-const pageList = ref<Page[]>([])
+const pageList = ref<IPage[]>([])
 const leaferEditor = ref<HTMLElement | null>(null)
 const leaferOption = ref<HTMLElement | null>(null)
+const bookInfo = ref<IBook>()
 
 const setActive = (index: number) => {
   activeIndex.value = index
@@ -48,21 +49,43 @@ const downLoad = () => {
 }
 
 const getPageList = async () => {
-  const data = [
-    {
-      pageID: '1',
-      img: img,
-    },
-    {
-      pageID: '2',
-      img: img,
-    },
-    {
-      pageID: '3',
-      img: img,
-    },
-  ]
-  pageList.value = data
+  try {
+    // 确保 bookInfo 存在
+    if (!bookInfo.value?.bookID) {
+      ElMessage.error('笔记信息不存在')
+      router.push('/main')
+      return
+    }
+
+    const pages = await getAllPage(bookInfo.value.bookID)
+
+    // 计算需要补充的页数
+    const needAddCount = bookInfo.value.pageNum - pages.length
+
+    if (needAddCount > 0) {
+      // 需要补充页面
+      const newPages: IPage[] = Array.from({ length: needAddCount }, (_, index) => ({
+        // pageID: `${bookInfo.value!.bookID}_${pages.length + index + 1}`, // 使用 bookID_pageNumber 作为 pageID
+        pageID: '',
+        bookID: bookInfo.value!.bookID,
+        pageNumber: pages.length + index + 1,
+        pageJson: '', // 初始页面数据为空
+        pageType: {}, // 初始页面类型配置为空对象
+        img: img, // 使用默认图片
+      }))
+
+      // 将新页面添加到数据库
+      // await Promise.all(newPages.map((page) => updatePage(page)))
+
+      // 更新页面列表
+      pageList.value = [...pages, ...newPages]
+    } else {
+      pageList.value = pages
+    }
+  } catch (error) {
+    console.error('获取页面列表失败:', error)
+    ElMessage.error('获取页面列表失败')
+  }
 }
 
 const backHome = () => {
@@ -70,7 +93,21 @@ const backHome = () => {
 }
 
 onMounted(async () => {
-  getPageList()
+  try {
+    const storedBookInfo = localStorage.getItem('bookInfo')
+    if (!storedBookInfo) {
+      ElMessage.error('笔记信息不存在')
+      router.push('/main')
+      return
+    }
+
+    bookInfo.value = JSON.parse(storedBookInfo)
+    await getPageList()
+  } catch (error) {
+    console.error('初始化失败:', error)
+    ElMessage.error('初始化失败')
+    router.push('/main')
+  }
 })
 </script>
 
