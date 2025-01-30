@@ -140,6 +140,7 @@ const getPageData = async () => {
     })
   } else {
     const res = await getDetailPage(pageID)
+    nowSelectPage.value = res[0]
     leaferEditor.value.setDataJson(res[0].pageJson)
   }
 }
@@ -194,8 +195,15 @@ onMounted(async () => {
         </div>
       </div>
       <div class="right">
-        <el-button @click="pageGoto(nowPageIndex - 1)">上一页</el-button>
-        <el-button @click="pageGoto(nowPageIndex + 1)">下一页</el-button>
+        <el-button :disabled="nowPageIndex === 0" @click="pageGoto(nowPageIndex - 1)"
+          >上一页</el-button
+        >
+        <p>第{{ nowPageIndex + 1 }}页</p>
+        <el-button
+          :disabled="nowPageIndex === pageList.length - 1"
+          @click="pageGoto(nowPageIndex + 1)"
+          >下一页</el-button
+        >
       </div>
     </div>
     <div class="body">
@@ -210,7 +218,7 @@ onMounted(async () => {
           <div class="text">第{{ index + 1 }}页</div>
         </div>
       </el-scrollbar>
-      <div class="page-now">
+      <div v-loading="!refreshLeafer" class="page-now">
         <LeaferEditor
           v-if="pageList.length && refreshLeafer"
           ref="leaferEditor"
@@ -283,6 +291,11 @@ onMounted(async () => {
       width: 338px;
       display: flex;
       justify-content: space-around;
+      align-items: center;
+      p {
+        font-size: 14px;
+        color: #666;
+      }
     }
   }
   .body {

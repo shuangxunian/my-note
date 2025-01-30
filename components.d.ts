@@ -39,4 +39,7 @@ declare module 'vue' {
     ToolIndex: typeof import('./src/components/option/tools-components/toolIndex.vue')['default']
     ToolsIndex: typeof import('./src/components/option/tools-components/toolsIndex.vue')['default']
   }
+  export interface ComponentCustomProperties {
+    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
+  }
 }
