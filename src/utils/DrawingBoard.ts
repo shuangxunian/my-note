@@ -330,6 +330,14 @@ class DrawingBoard {
       this.selectedGraphics.value ? this.selectedGraphics.value : this.tools.getActiveGraphics(),
     )
   }
+  public getDataJson = () => {
+    return this.leaferInstance.tree.toJSON()
+  }
+
+  public setDataJson = (dataJson) => {
+    this.leaferInstanceReadonly.tree.clear()
+    this.leaferInstance.tree.set(dataJson)
+  }
 
   changeDisposition = (type: string, val) => {
     this.getSelectedGraphics().value[type] = val

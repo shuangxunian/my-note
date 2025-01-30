@@ -83,6 +83,18 @@ class App {
     return null
   }
 
+  // 获取画板数据
+  static getDataJson() {
+    if (this.drawingBoardInstance) {
+      return this.drawingBoardInstance.getDataJson()
+    }
+  }
+  // 写入画板数据
+  static setDataJson(dataJson) {
+    if (this.drawingBoardInstance) {
+      this.drawingBoardInstance.setDataJson(dataJson)
+    }
+  }
   // 添加监听 selectedGraphics 变化的方法
   static onSelectedGraphicsChange(callback: (value: any) => void) {
     if (this.drawingBoardInstance) {

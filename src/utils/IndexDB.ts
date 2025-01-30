@@ -1,4 +1,4 @@
-import type { IBook, IPage } from '@/types/book'
+import type { IBook, IPage, IDetailPage } from '@/types/book'
 
 class IndexDB {
   private static instance: IndexDB | null = null
@@ -36,6 +36,7 @@ class IndexDB {
         if (!db.objectStoreNames.contains('Pages')) {
           const pageStore = db.createObjectStore('Pages', { keyPath: 'pageID' })
           pageStore.createIndex('bookID', 'bookID', { unique: false })
+          pageStore.createIndex('pageID', 'pageID', { unique: false })
         }
       }
 
@@ -122,7 +123,7 @@ class IndexDB {
     })
   }
 
-  // 获取页面
+  // 获取当前笔记全部页面
   public async getAllPage(bookID: string): Promise<IPage[]> {
     await this.initDB()
     return new Promise((resolve, reject) => {
@@ -142,9 +143,48 @@ class IndexDB {
       request.onerror = () => reject(new Error('获取页面失败'))
     })
   }
+
+  // 获取当前笔记指定页面 带页面固定数据
+  public async getDetailPage(pageID: string): Promise<IPage[]> {
+    await this.initDB()
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        reject(new Error('数据库未初始化'))
+        return
+      }
+
+      const transaction = this.db.transaction(['Pages'], 'readonly')
+      const store = transaction.objectStore('Pages')
+      const index = store.index('pageID')
+      const request = index.getAll(pageID)
+
+      request.onsuccess = () => {
+        resolve(request.result || [])
+      }
+      request.onerror = () => reject(new Error('获取页面失败'))
+    })
+  }
+
+  // 添加页面
+  public async addDetailPage(data): Promise<void> {
+    await this.initDB()
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        reject(new Error('数据库未初始化'))
+        return
+      }
+
+      const transaction = this.db.transaction(['Pages'], 'readwrite')
+      const store = transaction.objectStore('Pages')
+      const request = store.add(data)
+
+      request.onsuccess = () => resolve()
+      request.onerror = () => reject(new Error('添加页面失败'))
+    })
+  }
   // 更新页面，删除页面
   // 因为删除的本质就是将当页全部数据更新为空，所以只需要在调用端将参数传空即可
-  public async updatePage(page: IPage): Promise<void> {
+  public async updatePage(page: IDetailPage): Promise<void> {
     await this.initDB()
     return new Promise((resolve, reject) => {
       if (!this.db) {
@@ -180,8 +220,10 @@ export const getAllBooks = async () => await db.getAllBooks()
 export const updateBook = async (book: IBook) => await db.updateBook(book)
 export const deleteBook = async (bookID: string) => await db.deleteBook(bookID)
 export const getAllPage = async (bookID: string) => await db.getAllPage(bookID)
-export const updatePage = async (page: IPage) => await db.updatePage(page)
-export const deletePage = async (page: IPage) => await db.updatePage(page)
+export const getDetailPage = async (pageID: string) => await db.getDetailPage(pageID)
+export const addDetailPage = async (data) => await db.addDetailPage(data)
+export const updatePage = async (page: IDetailPage) => await db.updatePage(page)
+export const deletePage = async (page: IDetailPage) => await db.updatePage(page)
 export const deleteDatabase = async () => await db.deleteDatabase()
 // 默认导出实例
 export default db

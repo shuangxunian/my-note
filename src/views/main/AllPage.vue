@@ -8,6 +8,7 @@ import { addBook, getAllBooks } from '@/utils/IndexDB'
 import { ElMessage } from 'element-plus'
 import type { IBook } from '@/types/book'
 import UserInfo from './conponents/userInfo.vue'
+import { useBookInfoStore } from '@/store/bookInfo'
 
 const isBlack = ref(false)
 const items = ['我的', '收藏', '商城']
@@ -23,6 +24,8 @@ const form = ref({
   img: img,
   des: '',
 })
+
+const bookInfoStore = useBookInfoStore()
 
 const selectTheme = () => {
   const html = document.documentElement
@@ -95,8 +98,8 @@ const saveUserInfoChange = async () => {
 }
 
 // 跳转到笔记详情页
-const toBookDetail = (book) => {
-  localStorage.setItem('bookInfo', JSON.stringify(book))
+const toBookDetail = (book: IBook) => {
+  bookInfoStore.setBookInfo(book)
   router.push('/bookDetail')
 }
 
@@ -108,6 +111,7 @@ const toUserInfo = () => {
 const breakUser = () => {
   localStorage.removeItem('token')
   localStorage.removeItem('userInfo')
+  bookInfoStore.clearBookInfo() // 清除书籍信息
   router.push('/login')
 }
 

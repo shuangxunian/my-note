@@ -23,6 +23,9 @@ declare module '@/utils/App' {
     historyUnBack: () => void
     clearData: (activeIndex: number) => void
     downLoad: () => void
+    getDataJson: () => void
+    setDataJson: (dataJson) => void
+
     changeDisposition: (type: string, value: string | number) => void
     changePageDisposition: (type: string, value: string | number) => void
     // 添加这两个新方法的类型定义

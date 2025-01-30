@@ -2,14 +2,25 @@
 import { onMounted, onUnmounted, watch, ref } from 'vue'
 import App from '@/utils/App'
 
+import type { IPage } from '@/types/book'
+
 const leaferEditor = ref<HTMLElement | null>(null)
 
 const props = withDefaults(
   defineProps<{
     activeIndex: number
+    nowPage: number
+    pageData: IPage
   }>(),
   {
     activeIndex: 0,
+    nowPage: 0,
+    pageData: () => ({
+      pageID: '',
+      bookID: '',
+      pageNumber: 0,
+      img: '',
+    }),
   },
 )
 
@@ -20,6 +31,15 @@ watch(
     App.activeIndexChange(newIndex)
   },
   { immediate: true }, // 立即执行一次
+)
+
+// 监听 nowPage 的变化
+watch(
+  () => props.nowPage,
+  async (newIndex) => {
+    // await savePageData()
+    // await getPageData()
+  },
 )
 
 const historyBack = () => {
@@ -34,15 +54,15 @@ const clearData = () => {
 const downLoad = () => {
   App.downLoad()
 }
+const getDataJson = () => {
+  return JSON.stringify(App.getDataJson())
+}
+const setDataJson = (pageJson: string) => {
+  App.setDataJson(JSON.parse(pageJson))
+}
 
-defineExpose({
-  historyBack,
-  historyUnBack,
-  clearData,
-  downLoad,
-})
-
-onMounted(() =>
+const buildLeafer = async () => {
+  // await getPageData()
   App.init({
     domId: 'leafer-editor',
     config: {
@@ -55,10 +75,29 @@ onMounted(() =>
     onChange: (json) => {
       console.log(json)
     },
-  }),
-)
+  })
+}
 
-onUnmounted(() => App.destroy())
+const unloadLeafer = async () => {
+  App.destroy()
+}
+
+onMounted(() => {
+  buildLeafer()
+})
+
+onUnmounted(() => {
+  unloadLeafer()
+})
+
+defineExpose({
+  historyBack,
+  historyUnBack,
+  clearData,
+  downLoad,
+  getDataJson,
+  setDataJson,
+})
 </script>
 
 <template>

@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import LeaferEditor from '@/components/editor/leaferEditor.vue'
 import LeaferOption from '@/components/option/leaferOption.vue'
 import img from '@/assets/img/default-page.png'
+import _ from 'lodash'
 
 import { ElMessage } from 'element-plus'
-import type { IBook, IPage } from '@/types/book'
-import { getAllPage } from '@/utils/IndexDB'
+import type { IBook, IPage, IPageType, IDetailPage } from '@/types/book'
+import { getAllPage, getDetailPage, addDetailPage, updatePage } from '@/utils/IndexDB'
+import { useBookInfoStore } from '@/store/bookInfo'
 
 const router = useRouter()
 
@@ -26,7 +28,15 @@ const activeIndex = ref(0)
 const pageList = ref<IPage[]>([])
 const leaferEditor = ref<HTMLElement | null>(null)
 const leaferOption = ref<HTMLElement | null>(null)
-const bookInfo = ref<IBook>()
+const bookInfoStore = useBookInfoStore()
+const bookInfo = ref(bookInfoStore.getBookInfo())
+const nowPageIndex = ref<number>(0)
+const nowSelectPage = ref<IDetailPage>()
+const refreshLeafer = ref(false)
+
+const pageData = computed(() => {
+  return pageList.value[nowPageIndex.value]
+})
 
 const setActive = (index: number) => {
   activeIndex.value = index
@@ -65,17 +75,11 @@ const getPageList = async () => {
     if (needAddCount > 0) {
       // 需要补充页面
       const newPages: IPage[] = Array.from({ length: needAddCount }, (_, index) => ({
-        // pageID: `${bookInfo.value!.bookID}_${pages.length + index + 1}`, // 使用 bookID_pageNumber 作为 pageID
         pageID: '',
         bookID: bookInfo.value!.bookID,
         pageNumber: pages.length + index + 1,
-        pageJson: '', // 初始页面数据为空
-        pageType: {}, // 初始页面类型配置为空对象
         img: img, // 使用默认图片
       }))
-
-      // 将新页面添加到数据库
-      // await Promise.all(newPages.map((page) => updatePage(page)))
 
       // 更新页面列表
       pageList.value = [...pages, ...newPages]
@@ -92,17 +96,63 @@ const backHome = () => {
   router.push('/main')
 }
 
+const savePage = async () => {
+  const pageJson = await leaferEditor.value.getDataJson()
+  activeIndex.value = 0
+  refreshLeafer.value = false
+  const res = await updatePage({
+    ..._.cloneDeep(nowSelectPage.value),
+    pageJson: pageJson,
+  })
+  refreshLeafer.value = true
+}
+
+const pageGoto = async (index: number) => {
+  await savePage()
+  if (index < 0 || index >= pageList.value.length) return
+  nowPageIndex.value = index
+  getPageData()
+}
+
+const getPageData = async () => {
+  refreshLeafer.value = true
+  const { pageID, bookID } = pageData.value
+
+  if (pageID === '') {
+    const pageType = {
+      ...bookInfo.value.globalType,
+    }
+    nowSelectPage.value = {
+      pageID: `${bookID}_${nowPageIndex.value}`,
+      bookID: bookID,
+      pageJson: '',
+      pageNumber: nowPageIndex.value,
+      pageType: { ...pageType },
+      img: img, // 使用默认图片
+    }
+    pageList.value[nowPageIndex.value] = nowSelectPage.value
+    const res = await addDetailPage({
+      pageID: `${bookID}_${nowPageIndex.value}`,
+      bookID: bookID,
+      pageJson: '',
+      pageNumber: nowPageIndex.value,
+      pageType: { ...pageType },
+    })
+  } else {
+    const res = await getDetailPage(pageID)
+    leaferEditor.value.setDataJson(res[0].pageJson)
+  }
+}
+
 onMounted(async () => {
   try {
-    const storedBookInfo = localStorage.getItem('bookInfo')
-    if (!storedBookInfo) {
+    if (!bookInfo.value) {
       ElMessage.error('笔记信息不存在')
       router.push('/main')
       return
     }
-
-    bookInfo.value = JSON.parse(storedBookInfo)
     await getPageList()
+    await getPageData()
   } catch (error) {
     console.error('初始化失败:', error)
     ElMessage.error('初始化失败')
@@ -144,19 +194,30 @@ onMounted(async () => {
         </div>
       </div>
       <div class="right">
-        <el-button>上一页</el-button>
-        <el-button>下一页</el-button>
+        <el-button @click="pageGoto(nowPageIndex - 1)">上一页</el-button>
+        <el-button @click="pageGoto(nowPageIndex + 1)">下一页</el-button>
       </div>
     </div>
     <div class="body">
       <el-scrollbar class="page-list">
-        <div v-for="(item, index) in pageList" :key="index" class="page-item">
+        <div
+          v-for="(item, index) in pageList"
+          :key="index"
+          class="page-item"
+          @click="pageGoto(index)"
+        >
           <img class="page" :src="item.img" alt="" />
           <div class="text">第{{ index + 1 }}页</div>
         </div>
       </el-scrollbar>
       <div class="page-now">
-        <LeaferEditor ref="leaferEditor" :active-index="activeIndex" />
+        <LeaferEditor
+          v-if="pageList.length && refreshLeafer"
+          ref="leaferEditor"
+          :active-index="activeIndex"
+          :now-page="nowPageIndex"
+          :page-data="pageList[nowPageIndex]"
+        />
       </div>
       <div class="page-option">
         <LeaferOption ref="leaferOption" :active-index="activeIndex" />
