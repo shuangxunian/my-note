@@ -221,7 +221,7 @@ onMounted(async () => {
   flex-direction: column;
   .header {
     height: 40px;
-    max-width: 1920px;
+    // max-width: 1920px;
     padding: 10px 12px;
     display: flex;
     align-items: center;
