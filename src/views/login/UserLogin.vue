@@ -4,14 +4,16 @@ import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import router from '@/router'
 
+import { loginWithCode, sendVerificationCode } from '@/service/index'
+
 interface LoginForm {
   userMail: string
   code: string
 }
 
 const loginForm = ref<LoginForm>({
-  userMail: 'test@gmail.com',
-  code: '123456',
+  userMail: '2502353568@qq.com',
+  code: '',
 })
 const loginFormRef = ref<FormInstance>()
 const signInFormRef = ref<FormInstance>()
@@ -58,7 +60,12 @@ const signIn = async () => {
   })
 }
 
-const getCode = () => {
+const getCode = async () => {
+  const response = await sendVerificationCode({
+    userMail: loginForm.value.userMail,
+  })
+  debugger
+  console.log(response)
   ElMessage.success('验证码已发送至您的邮箱')
 }
 
