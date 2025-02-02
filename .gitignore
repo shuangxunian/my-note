@@ -30,7 +30,6 @@ coverage
 *.tsbuildinfo
 
 .vscode
-package-lock.json
 
 .env
 .env.development
