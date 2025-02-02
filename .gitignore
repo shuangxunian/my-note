@@ -31,3 +31,7 @@ coverage
 
 .vscode
 package-lock.json
+
+.env
+.env.development
+.env.production

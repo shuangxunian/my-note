@@ -9,22 +9,15 @@ declare module 'vue' {
   export interface GlobalComponents {
     ArrowTool: typeof import('./src/components/option/tools-components/arrowTool.vue')['default']
     DragTool: typeof import('./src/components/option/tools-components/dragTool.vue')['default']
-    ElAvatar: typeof import('element-plus/es')['ElAvatar']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
-    ElColorPicker: typeof import('element-plus/es')['ElColorPicker']
     ElDialog: typeof import('element-plus/es')['ElDialog']
     ElForm: typeof import('element-plus/es')['ElForm']
     ElFormItem: typeof import('element-plus/es')['ElFormItem']
     ElInput: typeof import('element-plus/es')['ElInput']
     ElLink: typeof import('element-plus/es')['ElLink']
     EllipseTool: typeof import('./src/components/option/tools-components/ellipseTool.vue')['default']
-    ElOption: typeof import('element-plus/es')['ElOption']
-    ElRadio: typeof import('element-plus/es')['ElRadio']
-    ElRadioGroup: typeof import('element-plus/es')['ElRadioGroup']
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
-    ElSelect: typeof import('element-plus/es')['ElSelect']
-    ElSlider: typeof import('element-plus/es')['ElSlider']
     EraserTool: typeof import('./src/components/option/tools-components/eraserTool.vue')['default']
     LeaferEditor: typeof import('./src/components/editor/leaferEditor.vue')['default']
     LeaferOption: typeof import('./src/components/option/leaferOption.vue')['default']
@@ -36,10 +29,6 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     SelectTool: typeof import('./src/components/option/tools-components/selectTool.vue')['default']
     TextTool: typeof import('./src/components/option/tools-components/textTool.vue')['default']
-    ToolIndex: typeof import('./src/components/option/tools-components/toolIndex.vue')['default']
     ToolsIndex: typeof import('./src/components/option/tools-components/toolsIndex.vue')['default']
-  }
-  export interface ComponentCustomProperties {
-    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
   }
 }

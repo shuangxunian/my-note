@@ -12,7 +12,7 @@ interface LoginForm {
 }
 
 const loginForm = ref<LoginForm>({
-  userMail: '2502353568@qq.com',
+  userMail: import.meta.env.VITE_DEV_MAIL || 'test@qq.com',
   code: '',
 })
 const loginFormRef = ref<FormInstance>()
