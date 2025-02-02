@@ -4,8 +4,6 @@ import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import router from '@/router'
 
-import { loginWithCode, sendVerificationCode } from '@/service/index'
-
 interface LoginForm {
   userMail: string
   code: string
@@ -13,12 +11,11 @@ interface LoginForm {
 
 const loginForm = ref<LoginForm>({
   userMail: import.meta.env.VITE_DEV_MAIL || 'test@qq.com',
-  code: '',
+  code: '123456',
 })
 const loginFormRef = ref<FormInstance>()
 const signInFormRef = ref<FormInstance>()
 const loading = ref(false)
-const checkedAgree = ref(false)
 const signInDialog = ref(false)
 const userAgreementDialog = ref(false)
 const form = ref({
@@ -61,19 +58,10 @@ const signIn = async () => {
 }
 
 const getCode = async () => {
-  const response = await sendVerificationCode({
-    userMail: loginForm.value.userMail,
-  })
-  debugger
-  console.log(response)
   ElMessage.success('验证码已发送至您的邮箱')
 }
 
 const handleLogin = async () => {
-  if (!checkedAgree.value) {
-    ElMessage.error('请先同意用户协议')
-    return
-  }
   if (!loginFormRef.value) return
 
   await loginFormRef.value.validate((valid) => {
@@ -131,7 +119,7 @@ const handleLogin = async () => {
             </el-button>
           </el-form-item>
         </el-form>
-        <div class="check-agree">
+        <!-- <div class="check-agree">
           <div class="check-agree-user">
             <el-checkbox v-model="checkedAgree"></el-checkbox>
             <span
@@ -144,7 +132,7 @@ const handleLogin = async () => {
           <div>
             <span class="user-agreement" @click="signInDialog = true">注册用户</span>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
 

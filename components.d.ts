@@ -9,6 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     ArrowTool: typeof import('./src/components/option/tools-components/arrowTool.vue')['default']
     DragTool: typeof import('./src/components/option/tools-components/dragTool.vue')['default']
+    ElAvatar: typeof import('element-plus/es')['ElAvatar']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
     ElDialog: typeof import('element-plus/es')['ElDialog']
@@ -17,6 +18,8 @@ declare module 'vue' {
     ElInput: typeof import('element-plus/es')['ElInput']
     ElLink: typeof import('element-plus/es')['ElLink']
     EllipseTool: typeof import('./src/components/option/tools-components/ellipseTool.vue')['default']
+    ElRadio: typeof import('element-plus/es')['ElRadio']
+    ElRadioGroup: typeof import('element-plus/es')['ElRadioGroup']
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
     EraserTool: typeof import('./src/components/option/tools-components/eraserTool.vue')['default']
     LeaferEditor: typeof import('./src/components/editor/leaferEditor.vue')['default']
